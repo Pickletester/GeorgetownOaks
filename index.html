@@ -1592,6 +1592,11 @@ function showPage(id) {
     target.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'instant' });
     setTimeout(checkReveal, 50);
+    // Animate hero content in
+    setTimeout(function() {
+      const hero = target.querySelector('.hero');
+      if (hero) hero.classList.add('hero-ready');
+    }, 50);
   }
   const footer = document.getElementById('site-footer');
   if (target) {
@@ -1635,16 +1640,6 @@ setTimeout(function() {
   const hero = document.querySelector('#page-home .hero');
   if (hero) hero.classList.add('hero-ready');
 }, 100);
-
-// Add hero-ready to other pages when navigated to
-const _origShowPage = showPage;
-showPage = function(id) {
-  _origShowPage(id);
-  setTimeout(function() {
-    const hero = document.querySelector('#page-' + id + ' .hero');
-    if (hero) hero.classList.add('hero-ready');
-  }, 50);
-};
 
 // ── Hero Ken Burns Slideshow ──
 (function() {
