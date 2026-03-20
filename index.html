@@ -1632,7 +1632,15 @@ window.addEventListener('popstate', (e) => {
 });
 
 // Load correct page on initial visit to a /weddings style URL
+// Also handles ?page=contact redirect from 404.html
 (function() {
+  const params = new URLSearchParams(window.location.search);
+  const pageParam = params.get('page');
+  if (pageParam && document.getElementById('page-' + pageParam)) {
+    history.replaceState(null, '', '/' + pageParam);
+    showPage(pageParam);
+    return;
+  }
   const path = window.location.pathname.replace('/', '').trim();
   if (path && document.getElementById('page-' + path)) {
     showPage(path);
