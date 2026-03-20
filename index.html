@@ -5,7 +5,9 @@
   <link rel="icon" href="/assets/favicon.png" type="image/png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Preload hero video for faster start -->
-<link rel="preload" as="video" href="https://pub-0f567c9a46274b7a94ebd35246fec71d.r2.dev/Images/DSC088835_xsakhn_1.mp4" type="video/mp4">
+<link rel="preload" as="image" href="https://pub-0f567c9a46274b7a94ebd35246fec71d.r2.dev/Images/HeroimageVenue.png" fetchpriority="high">
+<link rel="preload" as="image" href="https://pub-0f567c9a46274b7a94ebd35246fec71d.r2.dev/Images/DSC08859-HDR_efq1x2-elementor-io-optimized.webp">
+<link rel="preload" as="image" href="https://pub-0f567c9a46274b7a94ebd35246fec71d.r2.dev/Images/DSC08873_xcqvp4-elementor-io-optimized.webp">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6TL1SWRGM8"></script>
 <script>
@@ -1698,18 +1700,25 @@ window.addEventListener('popstate', (e) => {
     }, 50);
   }
 
+  // Preload next image before it's needed
+  function preloadImage(index) {
+    const img = new Image();
+    img.src = R2 + images[index];
+  }
+
+  // Preload images 4-8 progressively after page load
+  setTimeout(() => preloadImage(3), 3000);
+  setTimeout(() => preloadImage(4), 6000);
+  setTimeout(() => preloadImage(5), 9000);
+  setTimeout(() => preloadImage(6), 12000);
+  setTimeout(() => preloadImage(7), 15000);
+
   // Start first slide
   showSlide(0, 0);
   slides[0].style.opacity = '1';
   slides[0].style.zIndex = '2';
 
-  // Preload next image
-  setTimeout(() => {
-    const img = new Image();
-    img.src = R2 + images[1];
-  }, 1000);
-
-  // Advance every 5 seconds (5s display + 1.2s fade = 6.2s total feel)
+  // Advance every 6 seconds
   setInterval(nextSlide, 6000);
 })();
 
