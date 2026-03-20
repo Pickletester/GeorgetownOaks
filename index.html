@@ -1636,6 +1636,16 @@ setTimeout(function() {
   if (hero) hero.classList.add('hero-ready');
 }, 100);
 
+// Add hero-ready to other pages when navigated to
+const _origShowPage = showPage;
+showPage = function(id) {
+  _origShowPage(id);
+  setTimeout(function() {
+    const hero = document.querySelector('#page-' + id + ' .hero');
+    if (hero) hero.classList.add('hero-ready');
+  }, 50);
+};
+
 // ── Hero Ken Burns Slideshow ──
 (function() {
   const R2 = 'https://pub-0f567c9a46274b7a94ebd35246fec71d.r2.dev/Images/';
