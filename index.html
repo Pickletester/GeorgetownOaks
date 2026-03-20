@@ -187,6 +187,7 @@ a { text-decoration: none; color: inherit; }
   position: absolute; inset: 0;
   background-size: cover; background-position: center top;
   will-change: transform;
+  animation: kenBurns 18s ease-in-out infinite alternate;
 }
 .hero-bg::after {
   content: '';
@@ -199,9 +200,11 @@ a { text-decoration: none; color: inherit; }
       rgba(20,14,10,0.65) 80%,
       rgba(20,14,10,0.88) 100%);
 }
-@keyframes heroZoom {
-  from { transform: scale(1.08); }
-  to   { transform: scale(1.0);  }
+@keyframes kenBurns {
+  0%   { transform: scale(1.0)  translate(0%, 0%); }
+  33%  { transform: scale(1.06) translate(-1%, 0.5%); }
+  66%  { transform: scale(1.04) translate(1%, -0.5%); }
+  100% { transform: scale(1.08) translate(-0.5%, 1%); }
 }
 
 .hero-eyebrow {
@@ -1393,7 +1396,7 @@ a { text-decoration: none; color: inherit; }
 <div class="page" id="page-venue">
 
   <section class="hero">
-    <div class="hero-bg" style="background-image:url('https://pub-0f567c9a46274b7a94ebd35246fec71d.r2.dev/Images/Screenshot%202026-03-20%20at%2011.27.53%20AM.png');"></div>
+    <div class="hero-bg" style="background-image:url('https://pub-0f567c9a46274b7a94ebd35246fec71d.r2.dev/Images/HeroimageVenue.png');"></div>
     <p class="hero-eyebrow">The Venue</p>
     <h1 class="hero-title">Every Detail<br><em>Thoughtfully</em> Designed</h1>
     <div class="hero-rule"></div>
@@ -1490,7 +1493,7 @@ a { text-decoration: none; color: inherit; }
           </div>
           <div class="contact-detail">
             <div class="c-icon">✉️</div>
-            <div><div class="c-label">Email</div><div class="c-val"><a href="/cdn-cgi/l/email-protection#0a4765786d6b644a6d6f65786d6f7e657d64656b617924696567"><span class="__cf_email__" data-cfemail="fcb1938e9b9d92bc9b99938e9b9988938b92939d978fd29f9391">[email&#160;protected]</span></a></div></div>
+            <div><div class="c-label">Email</div><div class="c-val"><a href="mailto:Morgan@georgetownoaks.com">Morgan@georgetownoaks.com</a></div></div>
           </div>
           <div class="contact-detail">
             <div class="c-icon">🕐</div>
@@ -1731,7 +1734,7 @@ function setActiveNav(id) {
     <h3>1. Acceptance of Terms</h3>
     <p>By using our website, submitting an inquiry, touring the venue, placing a hold, or signing a proposal/invoice, you agree to these Terms and our Privacy Policy.</p>
     <h3>2. Who We Are</h3>
-    <p>Georgetown Oaks · 33 Mayview Rd, Canonsburg, PA 15317 · <a href="/cdn-cgi/l/email-protection#125f7d6075737c5275777d607577667d657c7d7379613c717d7f"><span class="__cf_email__" data-cfemail="9cd1f3eefbfdf2dcfbf9f3eefbf9e8f3ebf2f3fdf7efb2fff3f1">[email&#160;protected]</span></a> · (412) 914-8298</p>
+    <p>Georgetown Oaks · 33 Mayview Rd, Canonsburg, PA 15317 · <a href="mailto:Morgan@georgetownoaks.com">Morgan@georgetownoaks.com</a> · (412) 914-8298</p>
     <h3>3. Website Use</h3>
     <ul><li>Do not misuse the site or attempt unauthorized access.</li><li>Content is informational and may change without notice.</li><li>We may suspend access for violations.</li></ul>
     <h3>4. Quotes, Holds &amp; Bookings</h3>
@@ -1755,7 +1758,7 @@ function setActiveNav(id) {
     <h3>13. Governing Law</h3>
     <p>Governed by the laws of the Commonwealth of Pennsylvania. Disputes resolved through good-faith negotiation, then mediation/arbitration in Washington County, PA.</p>
     <h3>Contact</h3>
-    <p>Georgetown Oaks · 33 Mayview Rd, Canonsburg, PA 15317 · <a href="/cdn-cgi/l/email-protection#216c4e5346404f6146444e534644554e564f4e404a520f424e4c"><span class="__cf_email__" data-cfemail="05486a7762646b4562606a776260716a726b6a646e762b666a68">[email&#160;protected]</span></a> · (412) 914-8298</p>
+    <p>Georgetown Oaks · 33 Mayview Rd, Canonsburg, PA 15317 · <a href="mailto:Morgan@georgetownoaks.com">Morgan@georgetownoaks.com</a> · (412) 914-8298</p>
   </div>
 </div>
 
@@ -1764,7 +1767,7 @@ function setActiveNav(id) {
     <button class="legal-modal-close" onclick="closeModal('modal-privacy')">✕</button>
     <h2>Privacy Policy</h2>
     <h3>Who We Are</h3>
-    <p>Georgetown Oaks · 33 Mayview Rd, Canonsburg, PA 15317 · <a href="/cdn-cgi/l/email-protection#125f7d6075737c5275777d607577667d657c7d7379613c717d7f"><span class="__cf_email__" data-cfemail="4805273a2f2926082f2d273a2f2d3c273f262729233b662b2725">[email&#160;protected]</span></a> · (412) 914-8298</p>
+    <p>Georgetown Oaks · 33 Mayview Rd, Canonsburg, PA 15317 · <a href="mailto:Morgan@georgetownoaks.com">Morgan@georgetownoaks.com</a> · (412) 914-8298</p>
     <h3>Information We Collect</h3>
     <ul><li><strong>You provide:</strong> name, email, phone, event details, billing address, payment details, messages.</li><li><strong>Automatically:</strong> IP address, device/browser type, pages viewed, timestamps, general location.</li><li><strong>Third parties:</strong> limited info from providers you interact with (payment processor, scheduling tools).</li></ul>
     <h3>How We Use Your Information</h3>
@@ -1774,9 +1777,9 @@ function setActiveNav(id) {
     <h3>Data Retention</h3>
     <ul><li>Inquiries without booking: up to 24 months.</li><li>Booking records and invoices: 7 years (or as required by law).</li><li>Marketing list: until you unsubscribe.</li></ul>
     <h3>Your Rights</h3>
-    <p>You may request access, correction, deletion, or portability of your data. Contact us at <a href="/cdn-cgi/l/email-protection#95d8fae7f2f4fbd5f2f0fae7f2f0e1fae2fbfaf4fee6bbf6faf8"><span class="__cf_email__" data-cfemail="94d9fbe6f3f5fad4f3f1fbe6f3f1e0fbe3fafbf5ffe7baf7fbf9">[email&#160;protected]</span></a> or (412) 914-8298.</p>
+    <p>You may request access, correction, deletion, or portability of your data. Contact us at <a href="mailto:Morgan@georgetownoaks.com">Morgan@georgetownoaks.com</a> or (412) 914-8298.</p>
     <h3>Contact</h3>
-    <p>Georgetown Oaks · 33 Mayview Rd, Canonsburg, PA 15317 · <a href="/cdn-cgi/l/email-protection#1a5775687d7b745a7d7f75687d7f6e756d74757b716934797577"><span class="__cf_email__" data-cfemail="9fd2f0edf8fef1dff8faf0edf8faebf0e8f1f0fef4ecb1fcf0f2">[email&#160;protected]</span></a> · (412) 914-8298</p>
+    <p>Georgetown Oaks · 33 Mayview Rd, Canonsburg, PA 15317 · <a href="mailto:Morgan@georgetownoaks.com">Morgan@georgetownoaks.com</a> · (412) 914-8298</p>
   </div>
 </div>
 
@@ -1796,7 +1799,7 @@ function setActiveNav(id) {
     <h3>Security/Damage Deposit</h3>
     <p>Any security or damage deposit is refundable within a reasonable period after your event, minus deductions for damages or excessive cleanup.</p>
     <h3>Contact</h3>
-    <p><a href="/cdn-cgi/l/email-protection#65280a1702040b2502000a170200110a120b0a040e164b060a08"><span class="__cf_email__" data-cfemail="d69bb9a4b1b7b896b1b3b9a4b1b3a2b9a1b8b9b7bda5f8b5b9bb">[email&#160;protected]</span></a> · (412) 914-8298</p>
+    <p><a href="mailto:Morgan@georgetownoaks.com">Morgan@georgetownoaks.com</a> · (412) 914-8298</p>
   </div>
 </div>
 
@@ -1812,7 +1815,7 @@ ar testing against accessibility checklists and user feedback.</li></ul>
     <h3>Physical Accessibility</h3>
     <p>For in-person visits, please contact us ahead of time to discuss accessibility needs (entrance access, seating, parking, restroom access, service animals).</p>
     <h3>Feedback &amp; Contact</h3>
-    <p>Georgetown Oaks · 33 Mayview Rd, Canonsburg, PA 15317 · <a href="mailto:a.simeone@georgetownoaks.com">a.simeone@georgetownoaks.com</a> · 412-737-1853</p>
+    <p>Georgetown Oaks · 33 Mayview Rd, Canonsburg, PA 15317 · <a href="mailto:Morgan@georgetownoaks.com">Morgan@georgetownoaks.com</a> · (412) 914-8298</p>
     <p>Please include the page where you had trouble, your assistive technology/browser, and a description of the problem. We aim to respond within 2 business days.</p>
   </div>
 </div>
