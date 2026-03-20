@@ -256,11 +256,11 @@ a { text-decoration: none; color: inherit; }
   margin-bottom: 4rem;
 }
 .hero-scroll-hint {
-  position: absolute; bottom: 2.2rem; left: 0; right: 0; margin: 0 auto;
+  position: absolute; bottom: 2.2rem; left: 50%; transform: translateX(-50%);
   z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
   color: rgba(255,255,255,0.3);
   font-family: var(--sans); font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase;
-  width: fit-content; left: 50%; transform: translateX(-50%);
+  white-space: nowrap;
 }
 .hero-scroll-hint::after {
   content: ''; display: block; width: 1px; height: 44px;
