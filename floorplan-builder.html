@@ -139,6 +139,8 @@ const CAT = {
 // Fixed elements. The window wall is the LEFT edge (x = 0), the 46.5 ft side, doors at the top corner.
 // Sizes and gaps follow the photo labels. The last pillar is pinned to the corner, 2.6 ft short of its 14.58 ft gap.
 const FIXED = [
+  { type:'pillar', x:26.5,  y:1.083, w:2.167, d:2.167, rot:0, fill:'#3b4048' },
+  { type:'pillar', x:53.17, y:1.083, w:2.167, d:2.167, rot:0, fill:'#3b4048' },
   { type:'pillar', x:0.35,  y:40.350,  w:4.7,   d:0.7,  rot:90, fill:'#3b4048' },
   { type:'window', x:0.3,   y:35.100,  w:5.8,   d:0.6,  rot:90, fill:'#cfe6ee' },
   { type:'window', x:0.3,   y:22.950,  w:11.9,  d:0.6,  rot:90, fill:'#cfe6ee' },
@@ -290,7 +292,7 @@ function roomMarkup(){
   <text x="${W/2}" y="-2.4" text-anchor="middle" font-size="1.4" fill="#2a2f36" pointer-events="none">69 ft</text>
   <text transform="translate(${W+2.9} ${D/2}) rotate(90)" text-anchor="middle" font-size="1.4" fill="#2a2f36" pointer-events="none">46.5 ft</text>
   <g font-size="0.9" fill="#2a2f36" text-anchor="middle" pointer-events="none" opacity=".75">
-    ${FIXED.filter(f => f.type === 'pillar').map(p => `<text x="-1.2" y="${p.y}" text-anchor="end" dominant-baseline="central">Pillar</text>`).join('')}
+    ${FIXED.filter(f => f.type === 'pillar').map(p => p.rot ? `<text x="-1.2" y="${p.y}" text-anchor="end" dominant-baseline="central">Pillar</text>` : `<text x="${p.x}" y="-0.5" text-anchor="middle">Pillar</text>`).join('')}
   </g>`;
 }
 
