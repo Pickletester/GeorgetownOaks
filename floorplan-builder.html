@@ -114,7 +114,7 @@ label.inline{display:inline-flex;align-items:center;gap:6px;margin:0}
     </div>
     <p class="hint">
       Drag items to move them. Tables carry their chairs with them. Drag a chair off a table to detach it.
-      Pick a table, set the seat count, then press <b>Seat table</b>. Pillars are fixed.
+      Pick a table, set the seat count, then press <b>Seat table</b>. Pillars and windows are fixed.
       Dimensions are in feet. Each grid square is 5 ft.
     </p>
   </section>
@@ -136,10 +136,17 @@ const CAT = {
   bar:   { name:'Bar', sub:'12 ft wide (3 ft deep assumed)', short:'Bar', kind:'rect', w:12, d:3, limit:1, seats:0, seatable:false, fill:'#4a3322' },
 };
 
-// Fixed obstacles. Positions estimated from the photo measurements.
-const PILLARS = [
-  { x:26.5,  y:1.08, w:2.167, d:2.167 },
-  { x:53.17, y:1.08, w:2.167, d:2.167 },
+// Fixed elements along the window wall (top edge, y = 0). Positions from the
+// photo labels; the wall run is left to right: pillar, window, wall, window,
+// pillar in the wall gap, window, pillar, pillar.
+const FIXED = [
+  { type:'pillar', x:6.15,  y:0.35, w:4.7,   d:0.7,  fill:'#3b4048' },
+  { type:'window', x:11.4,  y:0.3,  w:5.8,   d:0.6,  fill:'#cfe6ee' },
+  { type:'window', x:23.55, y:0.3,  w:11.9,  d:0.6,  fill:'#cfe6ee' },
+  { type:'pillar', x:31.05, y:0.35, w:1.375, d:0.7,  fill:'#3b4048' },
+  { type:'window', x:35.5,  y:0.3,  w:5.8,   d:0.6,  fill:'#cfe6ee' },
+  { type:'pillar', x:53.67, y:0.35, w:1.375, d:0.7,  fill:'#3b4048' },
+  { type:'pillar', x:63.56, y:0.455, w:2.8,  d:0.91, fill:'#3b4048' },
 ];
 
 const svg = document.getElementById('plan');
@@ -276,8 +283,7 @@ function roomMarkup(){
   <text x="${W/2}" y="-2.4" text-anchor="middle" font-size="1.4" fill="#2a2f36" pointer-events="none">69 ft wall to wall</text>
   <text transform="translate(${W+2.9} ${D/2}) rotate(90)" text-anchor="middle" font-size="1.4" fill="#2a2f36" pointer-events="none">46.5 ft</text>
   <g font-size="0.9" fill="#2a2f36" text-anchor="middle" pointer-events="none" opacity=".75">
-    <text x="${PILLARS[0].x}" y="-0.4">Pillar</text>
-    <text x="${PILLARS[1].x}" y="-0.4">Pillar</text>
+    ${FIXED.filter(f => f.type === 'pillar').map(p => `<text x="${p.x}" y="-0.4">Pillar</text>`).join('')}
   </g>`;
 }
 
@@ -286,6 +292,12 @@ function bodyMarkup(it, stroke, sw){
   const attrs = `stroke="${stroke}" stroke-width="${sw}" vector-effect="non-scaling-stroke"`;
   if (it.type === 'pillar'){
     return `<rect x="${-hw}" y="${-hd}" width="${it.w}" height="${it.d}" fill="#3b4048" stroke="#1d2025" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+  }
+  if (it.type === 'window'){
+    return `
+      <rect x="${-hw}" y="${-hd}" width="${it.w}" height="${it.d}" fill="${it.fill}" ${attrs}/>
+      <line x1="0" y1="${-hd}" x2="0" y2="${hd}" stroke="#2a2f36" stroke-width="1" vector-effect="non-scaling-stroke"/>
+      <line x1="${-hw}" y1="0" x2="${hw}" y2="0" stroke="#2a2f36" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
   }
   if (it.type === 'chair'){
     return `
@@ -327,6 +339,7 @@ function render(){
 
 function describe(it){
   if (it.type === 'pillar') return 'Pillar (fixed)';
+  if (it.type === 'window') return 'Window (fixed)';
   if (it.type === 'chair') return it.parent != null ? 'Chair (at a table)' : 'Chair (loose)';
   if (it.type === 'custom') return `${it.label} · ${fmt(it.w)} × ${fmt(it.d)} ft`;
   return `${CAT[it.type].name} · ${CAT[it.type].sub}`;
@@ -495,9 +508,9 @@ function downloadSvg(){
 /* ---------- wiring ---------- */
 
 // Pillars: fixed, always present.
-items = PILLARS.map((p, i) => ({
-  id: i + 1, type:'pillar', x:p.x, y:p.y, rot:0, w:p.w, d:p.d,
-  shape:'rect', fill:'#3b4048', label:'', parent:null, lx:0, ly:0, lr:0, locked:true
+items = FIXED.map((p, i) => ({
+  id: i + 1, type:p.type, x:p.x, y:p.y, rot:0, w:p.w, d:p.d,
+  shape:'rect', fill:p.fill, label:'', parent:null, lx:0, ly:0, lr:0, locked:true
 }));
 nextId = items.length + 1;
 
