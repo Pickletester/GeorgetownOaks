@@ -164,6 +164,13 @@ const fmt = n => (Math.round(n * 10) / 10).toFixed(1);
 const rad = deg => deg * Math.PI / 180;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
+// Half-width and half-height of an item's footprint, allowing for its rotation.
+function halfExtents(it){
+  if (it.shape === 'circle') return [it.w / 2, it.w / 2];
+  const a = rad(it.rot), c = Math.abs(Math.cos(a)), sn = Math.abs(Math.sin(a));
+  return [(it.w / 2) * c + (it.d / 2) * sn, (it.w / 2) * sn + (it.d / 2) * c];
+}
+
 function rotPt(x, y, deg){
   const a = rad(deg);
   return [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)];
@@ -425,9 +432,9 @@ svg.addEventListener('pointermove', e => {
   // A chair dragged on its own leaves its table.
   if (it.type === 'chair') it.parent = null;
 
-  const r = Math.max(it.w, it.d) / 2;
-  nx = Math.min(W - r, Math.max(r, nx));
-  ny = Math.min(D - r, Math.max(r, ny));
+  const [hx, hy] = halfExtents(it);
+  nx = Math.min(W - hx, Math.max(hx, nx));
+  ny = Math.min(D - hy, Math.max(hy, ny));
 
   const ddx = nx - it.x, ddy = ny - it.y;
   it.x = nx;
