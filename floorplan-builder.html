@@ -148,7 +148,7 @@ const FIXED = [
   { type:'window', x:0.3,   y:11.000,  w:5.8,   d:0.6,  rot:90, fill:'#cfe6ee' },
   { type:'pillar', x:0.455, y:1.4,   w:2.8,   d:0.91, rot:90, fill:'#3b4048' },
   { type:'door',   x:3.2,   y:0.3,   w:4,     d:0.6,  fill:'#c8a24a', label:'Doors' },
-  { type:'bar', x:76.5, y:38.5, w:12, d:3, rot:90, fill:'#c9c9c9', label:'Bar (experimental)' },
+  { type:'bar', x:76.5, y:39.35, w:12, d:3, rot:90, fill:'#c9c9c9', label:'Bar (experimental)' },
 ];
 
 const svg = document.getElementById('plan');
@@ -281,6 +281,10 @@ function roomMarkup(){
   </defs>
   <rect x="0" y="0" width="${W}" height="${D}" fill="url(#planks)" stroke="#2a2f36" stroke-width="6" vector-effect="non-scaling-stroke"/>
   <rect x="0.7" y="0.7" width="${W-1.4}" height="${D-1.4}" fill="none" stroke="#c8a24a" stroke-width="1.5" vector-effect="non-scaling-stroke" pointer-events="none"/>
+  <rect x="${W-0.5}" y="32.2" width="1" height="14.3" fill="url(#planks)" pointer-events="none"/>
+  <rect x="${W}" y="32.2" width="9" height="14.3" fill="url(#planks)" pointer-events="none"/>
+  <path d="M ${W} 32.2 L ${W+9} 32.2 L ${W+9} ${D} L ${W} ${D}" fill="none" stroke="#2a2f36" stroke-width="5" vector-effect="non-scaling-stroke" pointer-events="none"/>
+  <text x="${W+4.5}" y="31.2" text-anchor="middle" font-size="1" fill="#2a2f36" pointer-events="none">Bar room</text>
   <g stroke="#2a2f36" stroke-width="1" fill="#2a2f36" vector-effect="non-scaling-stroke" pointer-events="none">
     <line x1="0" y1="-1.6" x2="${W}" y2="-1.6"/>
     <line x1="0" y1="-2.1" x2="0" y2="-1.1"/>
