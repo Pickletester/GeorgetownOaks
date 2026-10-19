@@ -5,7 +5,6 @@ const pageMeta = {
   private:   { title: 'Private Events | Georgetown Oaks · Canonsburg, PA',             desc: 'Host milestone birthdays, anniversaries, baby showers and more at Georgetown Oaks — Pittsburgh\'s premier private event venue.' },
   corporate: { title: 'Corporate Events | Georgetown Oaks · Canonsburg, PA',           desc: 'Modern event space for corporate gatherings, team meetings, product launches and holiday parties near Pittsburgh in Canonsburg, PA.' },
   venue:     { title: 'Venue Details | Georgetown Oaks · Canonsburg, PA',              desc: 'Explore Georgetown Oaks — 4,000 sq ft ballroom, 1,280 sq ft sunset deck, bridal suite, speakeasy, crystal chandeliers and more.' },
-  floorplan: { title: 'Floor Plan Builder | Georgetown Oaks · Canonsburg, PA', desc: 'Build your event layout for the Georgetown Oaks Main Hall. Place tables, chairs and custom items to scale and download your plan.' },
   contact:   { title: 'Schedule a Tour | Georgetown Oaks · Canonsburg, PA',            desc: 'Contact Georgetown Oaks to schedule a private tour. Reach Morgan at (412) 914-8298 or Morgan@georgetownoaks.com.' }
 };
 
