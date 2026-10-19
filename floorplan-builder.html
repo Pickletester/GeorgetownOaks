@@ -148,7 +148,7 @@ const FIXED = [
   { type:'window', x:0.3,   y:11.000,  w:5.8,   d:0.6,  rot:90, fill:'#cfe6ee' },
   { type:'pillar', x:0.455, y:1.4,   w:2.8,   d:0.91, rot:90, fill:'#3b4048' },
   { type:'door',   x:3.2,   y:0.3,   w:4,     d:0.6,  fill:'#c8a24a', label:'Doors' },
-  { type:'bar', x:76.5, y:39.35, w:12, d:3, rot:90, fill:'#c9c9c9', label:'Bar (experimental)' },
+  { type:'bar', x:76.5, y:36.5, w:12, d:3, rot:90, fill:'#c9c9c9', label:'Bar' },
 ];
 
 const svg = document.getElementById('plan');
@@ -356,7 +356,7 @@ function render(){
 function describe(it){
   if (it.type === 'pillar') return 'Pillar (fixed)';
   if (it.type === 'window') return 'Window (fixed)';
-  if (it.type === 'bar') return 'Bar (experimental, placement TBD)';
+  if (it.type === 'bar') return 'Bar';
   if (it.type === 'door') return 'Glass double doors (approx.)';
   if (it.type === 'chair') return it.parent != null ? 'Chair (at a table)' : 'Chair (loose)';
   if (it.type === 'custom') return `${it.label} · ${fmt(it.w)} × ${fmt(it.d)} ft`;
