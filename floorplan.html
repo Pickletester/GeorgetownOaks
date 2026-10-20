@@ -69,6 +69,8 @@ section .share-card{width:100%}
 }
 .phone-only{display:none}
 @media (max-width:700px){ .phone-only{display:inline-block} }
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:600px){.frow{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -165,10 +167,8 @@ section .share-card{width:100%}
         <input type="hidden" name="subject" value="Floor plan layout request">
         <input type="hidden" name="layout_code" id="layoutCodeField">
         <input type="hidden" name="layout_link" id="layoutLinkField">
-        <label>Name <input name="name" required></label>
-        <label>Email <input name="email" type="email" required></label>
-        <label>Phone <input name="phone" type="tel" required></label>
-        <label>Type of event
+        <div class="frow"><label>Name <input name="name" required></label><label>Email <input name="email" type="email" required></label></div>
+        <div class="frow"><label>Phone <input name="phone" type="tel" required></label><label>Type of event
           <select name="event_type" required>
             <option value="">Choose one</option>
             <option>Wedding</option>
@@ -176,7 +176,7 @@ section .share-card{width:100%}
             <option>Corporate event</option>
             <option>Other</option>
           </select>
-        </label>
+        </label></div>
         <label>Message <textarea name="message" rows="4"></textarea></label>
         <button type="submit" id="sendLayout">Send to Director of Events</button>
         <p id="sendStatus" role="status" class="muted"></p>
