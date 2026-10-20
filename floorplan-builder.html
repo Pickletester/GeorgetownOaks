@@ -139,15 +139,21 @@ const CAT = {
 // Fixed elements. The window wall is the LEFT edge (x = 0), the 46.5 ft side, doors at the top corner.
 // Sizes and gaps follow the photo labels. The last pillar is pinned to the corner, 2.6 ft short of its 14.58 ft gap.
 const FIXED = [
-  { type:'pillar', x:26.5,  y:1.083, w:2.167, d:2.167, rot:0, fill:'#3b4048' },
-  { type:'pillar', x:53.17, y:1.083, w:2.167, d:2.167, rot:0, fill:'#3b4048' },
+  { type:'door',   x:6.7,  y:0.3,  w:6.2, d:0.6, fill:'#c8a24a', label:'Glass doors' },
+  { type:'window', x:21.8, y:0.3,  w:6,   d:0.6, fill:'#cfe6ee' },
+  { type:'pillar', x:25.9, y:1.85, w:2.2, d:3.7, rot:0, fill:'#3b4048' },
+  { type:'window', x:30,   y:0.3,  w:6,   d:0.6, fill:'#cfe6ee' },
+  { type:'fireplace', x:39.05, y:0.5, w:8.3, d:1.0, fill:'#5a4a3a', label:'Fireplace' },
+  { type:'window', x:48.2, y:0.3,  w:6,   d:0.6, fill:'#cfe6ee' },
+  { type:'pillar', x:52.3, y:1.85, w:2.2, d:3.7, rot:0, fill:'#3b4048' },
+  { type:'window', x:56.4, y:0.3,  w:6,   d:0.6, fill:'#cfe6ee' },
+  { type:'door',   x:65.4, y:0.3,  w:3.2, d:0.6, fill:'#c8a24a', label:'Door' },
   { type:'pillar', x:0.35,  y:40.350,  w:4.7,   d:0.7,  rot:90, fill:'#3b4048' },
   { type:'window', x:0.3,   y:35.100,  w:5.8,   d:0.6,  rot:90, fill:'#cfe6ee' },
   { type:'window', x:0.3,   y:22.950,  w:11.9,  d:0.6,  rot:90, fill:'#cfe6ee' },
   { type:'pillar', x:0.35,  y:15.453,  w:1.375, d:0.7,  rot:90, fill:'#3b4048' },
   { type:'window', x:0.3,   y:11.000,  w:5.8,   d:0.6,  rot:90, fill:'#cfe6ee' },
   { type:'pillar', x:0.455, y:1.4,   w:2.8,   d:0.91, rot:90, fill:'#3b4048' },
-  { type:'door',   x:3.2,   y:0.3,   w:4,     d:0.6,  fill:'#c8a24a', label:'Doors' },
   { type:'bar', x:76.5, y:38.2, w:12, d:3, rot:90, fill:'#c9c9c9', label:'Bar' },
 ];
 
