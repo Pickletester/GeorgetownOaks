@@ -168,6 +168,7 @@ const svg = document.getElementById('plan');
 let items = [];
 let nextId = 1;
 let selectedId = null;
+let selection = [];
 let snap = true;
 let drag = null;
 
@@ -275,11 +276,10 @@ function seatTable(t){
 }
 
 function deleteSelected(){
-  const it = byId(selectedId);
-  if (!it || it.locked) return;
-  items = items.filter(i => i.id !== it.id && i.parent !== it.id);
-  selectedId = null;
-  refresh();
+  const ids = selection.filter(id => { const it = byId(id); return it && !it.locked; });
+  if (!ids.length) return;
+  items = items.filter(i => !ids.includes(i.id) && !ids.includes(i.parent));
+  select(null);
 }
 
 /* ---------- rendering ---------- */
@@ -340,7 +340,7 @@ function labelMarkup(it){
 }
 
 function itemHTML(it){
-  const sel = it.id === selectedId;
+  const sel = selection.includes(it.id);
   const stroke = sel ? '#1e73e8' : (it.type === 'chair' ? '#7a5d22' : '#2a2f36');
   const sw = sel ? 2.5 : 1;
   const cls = it.locked ? 'item locked' : 'item';
@@ -350,8 +350,8 @@ function itemHTML(it){
 const RANK = { chair: 2, custom: 0, pillar: 0, bar: 0, tableA: 1, tableB: 1, round: 1 };
 function render(){
   const ordered = items.slice().sort((a, b) => {
-    const ra = a.id === selectedId ? 3 : RANK[a.type];
-    const rb = b.id === selectedId ? 3 : RANK[b.type];
+    const ra = selection.includes(a.id) ? 3 : RANK[a.type];
+    const rb = selection.includes(b.id) ? 3 : RANK[b.type];
     return ra - rb;
   });
   $('items').innerHTML = ordered.map(itemHTML).join('');
@@ -378,9 +378,9 @@ function updateUI(){
   const seatable = !!(it && CAT[it.type] && CAT[it.type].seatable);
   $('btnSeat').disabled = !seatable;
   $('btnUnseat').disabled = !seatable;
-  $('btnRotate').disabled = !it || it.locked;
-  $('btnDelete').disabled = !it || it.locked;
-  $('btnDeleteSel').disabled = !it || it.locked;
+  $('btnRotate').disabled = !anyMovable();
+  $('btnDelete').disabled = !anyMovable();
+  $('btnDeleteSel').disabled = !anyMovable();
   $('rot').disabled = !it || it.locked;
 
   $('selName').textContent = it ? describe(it) : 'Nothing selected.';
@@ -400,11 +400,15 @@ function updateUI(){
     <div style="margin-top:6px" class="muted">Full inventory at 8 seats per table: ${fullSeats} seats.</div>`;
 }
 
+function anyMovable(){ return selection.some(id => { const x = byId(id); return x && !x.locked; }); }
 function refresh(){ render(); updateUI(); }
 
-function select(id){
-  selectedId = id;
-  const picked = id != null ? byId(id) : null;
+function select(id, additive){
+  if (id == null) selection = [];
+  else if (additive) selection = selection.includes(id) ? selection.filter(x => x !== id) : selection.concat(id);
+  else selection = [id];
+  selectedId = selection.length ? selection[selection.length - 1] : null;
+  const picked = selectedId != null ? byId(selectedId) : null;
   if (picked && CAT[picked.type] && CAT[picked.type].seatable) $('seats').value = '8';
   refresh();
 }
@@ -457,10 +461,12 @@ svg.addEventListener('pointerdown', e => {
   if (!g){ select(null); return; }
   const it = byId(parseInt(g.dataset.id, 10));
   if (!it) return;
-  select(it.id);
-  if (it.locked) return;
+  if (e.shiftKey) select(it.id, true);
+  else if (!selection.includes(it.id)) select(it.id);
+  if (!selection.includes(it.id) || it.locked) return;
   const p = toFt(e);
-  drag = { id: it.id, dx: it.x - p.x, dy: it.y - p.y };
+  drag = { id: it.id, ax: p.x, ay: p.y, px: it.x, py: it.y,
+           starts: selection.map(sid => { const m = byId(sid); return { id: sid, x: m.x, y: m.y }; }) };
   svg.setPointerCapture(e.pointerId);
   e.preventDefault();
 });
@@ -473,25 +479,31 @@ svg.addEventListener('pointermove', e => {
     return;
   }
   if (!drag) return;
-  const it = byId(drag.id);
-  if (!it) return;
   const p = toFt(e);
-  let nx = p.x + drag.dx, ny = p.y + drag.dy;
+  let dx = p.x - drag.ax, dy = p.y - drag.ay;
   if (snap){
-    nx = Math.round(nx * 2) / 2;
-    ny = Math.round(ny * 2) / 2;
+    dx = Math.round((drag.px + dx) * 2) / 2 - drag.px;
+    dy = Math.round((drag.py + dy) * 2) / 2 - drag.py;
   }
-  // A chair dragged on its own leaves its table.
-  if (it.type === 'chair') it.parent = null;
-
-  const [hx, hy] = halfExtents(it);
-  nx = Math.min(W - hx, Math.max(hx, nx));
-  ny = Math.min(D - hy, Math.max(hy, ny));
-
-  const ddx = nx - it.x, ddy = ny - it.y;
-  it.x = nx;
-  it.y = ny;
-  items.forEach(c => { if (c.parent === it.id){ c.x += ddx; c.y += ddy; } });
+  // Chairs riding on a selected table move with it; everything else moves on its own.
+  const movers = drag.starts.filter(s => {
+    const m = byId(s.id);
+    return m && !m.locked && !(m.type === 'chair' && m.parent != null && drag.starts.some(t => t.id === m.parent));
+  });
+  // Keep every moving piece inside the room.
+  movers.forEach(s => {
+    const m = byId(s.id);
+    const [hx, hy] = halfExtents(m);
+    dx = Math.min(Math.max(dx, hx - s.x), W - hx - s.x);
+    dy = Math.min(Math.max(dy, hy - s.y), D - hy - s.y);
+  });
+  movers.forEach(s => {
+    const m = byId(s.id);
+    if (m.type === 'chair') m.parent = null;
+    m.x = s.x + dx;
+    m.y = s.y + dy;
+  });
+  movers.forEach(s => { const m = byId(s.id); if (m.type !== 'chair') syncChildren(m); });
   render();
 });
 
@@ -509,7 +521,7 @@ document.addEventListener('keydown', e => {
   if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
   if ((e.metaKey || e.ctrlKey) && (e.key === 'c' || e.key === 'C')){ copySelected(); return; }
   if ((e.metaKey || e.ctrlKey) && (e.key === 'v' || e.key === 'V')){ e.preventDefault(); pasteClipboard(); return; }
-  if (selectedId == null) return;
+  if (!selection.length) return;
   if (e.key === 'Delete' || e.key === 'Backspace'){ e.preventDefault(); deleteSelected(); }
   else if (e.key === 'r' || e.key === 'R'){ rotateSelected(90); }
   else if (e.key === 'Escape'){ select(null); }
@@ -517,41 +529,51 @@ document.addEventListener('keydown', e => {
 
 let clipboard = null;
 function copySelected(){
-  const it = byId(selectedId);
-  if (!it || it.locked) return;
-  clipboard = { root: Object.assign({}, it), kids: items.filter(i => i.parent === it.id).map(k => Object.assign({}, k)) };
-  toast('Copied.');
+  const roots = selection.map(byId).filter(i => i && !i.locked && !(i.parent != null && selection.includes(i.parent)));
+  if (!roots.length) return;
+  const rootIds = roots.map(r => r.id);
+  clipboard = {
+    roots: roots.map(r => Object.assign({}, r)),
+    kids: items.filter(k => k.parent != null && rootIds.includes(k.parent)).map(k => Object.assign({}, k))
+  };
+  toast(`Copied ${roots.length} item${roots.length > 1 ? 's' : ''}.`);
 }
 function pasteClipboard(){
   if (!clipboard) return;
-  const src = clipboard.root;
-  const cat = CAT[src.type];
-  if (cat && countType(src.type) >= cat.limit){ toast(`No ${cat.name} left to place.`); return; }
-  const props = Object.assign({}, src);
-  delete props.id;
-  props.x = src.x + 2;
-  props.y = src.y + 2;
-  props.parent = null;
-  props.locked = false;
-  const it = addItem(props);
-  let placed = 0;
+  const idMap = {}, newIds = [];
+  let skipped = 0, chairsSkipped = 0;
+  clipboard.roots.forEach(src => {
+    const cat = CAT[src.type];
+    if (cat && countType(src.type) >= cat.limit){ skipped++; return; }
+    const props = Object.assign({}, src);
+    delete props.id;
+    props.x = src.x + 2;
+    props.y = src.y + 2;
+    props.parent = null;
+    props.locked = false;
+    const it = addItem(props);
+    idMap[src.id] = it.id;
+    newIds.push(it.id);
+  });
   clipboard.kids.forEach(k => {
-    if (remaining('chair') <= 0) return;
+    const parentNew = idMap[k.parent];
+    if (parentNew == null) return;
+    if (remaining('chair') <= 0){ chairsSkipped++; return; }
     const c = Object.assign({}, k);
     delete c.id;
-    c.parent = it.id;
+    c.parent = parentNew;
     addItem(c);
-    placed++;
   });
-  syncChildren(it);
-  select(it.id);
-  if (placed < clipboard.kids.length) toast(`Pasted ${placed} of ${clipboard.kids.length} chairs. No more chairs left.`);
+  newIds.forEach(id => { const t = byId(id); if (t.type !== 'chair') syncChildren(t); });
+  selection = newIds;
+  selectedId = newIds.length ? newIds[newIds.length - 1] : null;
+  refresh();
+  if (skipped || chairsSkipped) toast(`Pasted ${newIds.length}. Skipped ${skipped} item(s) and ${chairsSkipped} chair(s) with none left.`);
 }
-
 function rotateSelected(delta){
-  const it = byId(selectedId);
-  if (!it || it.locked) return;
-  setRot(it, it.rot + delta);
+  const movers = selection.map(byId).filter(i => i && !i.locked && !(i.type === 'chair' && i.parent != null && selection.includes(i.parent)));
+  if (!movers.length) return;
+  movers.forEach(m => setRot(m, m.rot + delta));
   refresh();
 }
 
@@ -583,6 +605,7 @@ function load(){
     if (!data || !Array.isArray(data.items)) throw new Error('bad data');
     items = data.items;
     nextId = data.nextId || (Math.max(0, ...items.map(i => i.id)) + 1);
+    selection = [];
     selectedId = null;
     refresh();
     toast('Layout loaded.');
@@ -641,7 +664,7 @@ $('addCustom').addEventListener('click', () => {
 $('btnRotate').addEventListener('click', () => rotateSelected(90));
 $('btnDelete').addEventListener('click', deleteSelected);
 $('btnDeleteSel').addEventListener('click', deleteSelected);
-$('btnSeat').addEventListener('click', () => { seatTable(byId(selectedId)); refresh(); });
+$('btnSeat').addEventListener('click', () => { selection.forEach(id => seatTable(byId(id))); refresh(); });
 $('btnUnseat').addEventListener('click', () => {
   const t = byId(selectedId);
   if (!t) return;
@@ -662,6 +685,7 @@ $('btnMeasure').addEventListener('click', () => setMeasuring(!measuring));
 $('btnClear').addEventListener('click', () => {
   if (!confirm('Remove all tables, chairs and custom items?')) return;
   items = items.filter(i => i.locked);
+  selection = [];
   selectedId = null;
   refresh();
 });
