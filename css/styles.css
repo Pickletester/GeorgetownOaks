@@ -578,13 +578,13 @@ a { text-decoration: none; color: inherit; }
   font-size: 0.95rem; color: var(--gold);
 }
 .c-label {
-  font-family: var(--sans); font-size: 0.58rem;
+  font-family: var(--sans); font-size: 0.72rem;
   letter-spacing: 0.15em; text-transform: uppercase;
-  color: rgba(255,255,255,0.28); margin-bottom: 0.3rem;
+  color: rgba(255,255,255,0.62); margin-bottom: 0.3rem;
 }
 .c-val {
-  font-family: var(--serif-body); font-size: 1rem;
-  font-weight: 300; color: rgba(255,255,255,0.75); line-height: 1.5;
+  font-family: var(--serif-body); font-size: 1.15rem;
+  font-weight: 400; color: rgba(255,255,255,0.94); line-height: 1.5;
 }
 .c-val a { color: var(--gold); }
 
@@ -601,20 +601,21 @@ a { text-decoration: none; color: inherit; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .fg { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
 .fg label {
-  font-family: var(--sans); font-size: 0.58rem;
+  font-family: var(--sans); font-size: 0.72rem;
   letter-spacing: 0.14em; text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.65);
 }
 .fg input, .fg select, .fg textarea {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(196,164,107,0.18);
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.97);
   padding: 0.85rem 1rem;
-  font-family: var(--serif-body); font-size: 0.95rem; font-weight: 300;
+  font-family: var(--serif-body); font-size: 1.1rem; font-weight: 400;
   outline: none; width: 100%;
   transition: border-color 0.2s;
 }
 .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--gold); }
+.fg input::placeholder, .fg textarea::placeholder { color: rgba(255,255,255,0.55); opacity: 1; }
 .fg select option { background: var(--ink2); }
 .fg textarea { resize: vertical; min-height: 100px; }
 .form-btn {
