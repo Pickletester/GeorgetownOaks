@@ -124,7 +124,6 @@ section .share-wrap{padding:0;max-width:none;margin-top:24px}
         <button id="btnRedo" class="ghost" disabled>Redo</button>
         <button id="btnCopy" class="ghost">Copy</button>
         <button id="btnPaste" class="ghost">Paste</button>
-        <button id="btnMulti" class="ghost">Multi-select</button>
         <button id="btnRotate" class="ghost">Rotate 90° (R)</button>
         <button id="btnDelete" class="danger">Delete selected</button>
       </div>
@@ -867,11 +866,6 @@ let multiMode = false;
 $('preset100').addEventListener('click', () => buildPreset(100));
 $('preset150').addEventListener('click', () => buildPreset(150));
 $('preset200').addEventListener('click', () => buildPreset(200));
-$('btnMulti').addEventListener('click', () => {
-  multiMode = !multiMode;
-  $('btnMulti').textContent = multiMode ? 'Multi-select: on' : 'Multi-select';
-  $('btnMulti').className = multiMode ? '' : 'ghost';
-});
 /* ---------- shareable layout code ---------- */
 const TYPES = ['tableA','tableB','round','chair','bar','custom','pillar','window','door','fireplace'];
 function toBase64Url(bytes){
