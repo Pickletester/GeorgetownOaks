@@ -101,7 +101,6 @@ label.inline{display:inline-flex;align-items:center;gap:6px;margin:0}
       <button id="btnDelete" class="danger">Delete selected</button>
       <span class="sep"></span>
       <label class="inline">Chairs per table <select id="seats" class="narrow"><option value="6">6</option><option value="7">7</option><option value="8" selected>8</option><option value="9">9</option><option value="10">10</option></select></label>
-      <button id="btnSeat" class="ghost">Seat table</button>
       <button id="btnUnseat" class="ghost">Clear its chairs</button>
       <span class="sep"></span>
       <label class="inline"><input id="snap" type="checkbox" checked> Snap to 6 in</label>
@@ -376,7 +375,6 @@ function updateUI(){
 
   const it = byId(selectedId);
   const seatable = !!(it && CAT[it.type] && CAT[it.type].seatable);
-  $('btnSeat').disabled = !seatable;
   $('btnUnseat').disabled = !seatable;
   $('btnRotate').disabled = !anyMovable();
   $('btnDelete').disabled = !anyMovable();
@@ -404,12 +402,15 @@ function anyMovable(){ return selection.some(id => { const x = byId(id); return 
 function refresh(){ render(); updateUI(); }
 
 function select(id, additive){
+  const before = selection.slice();
   if (id == null) selection = [];
   else if (additive) selection = selection.includes(id) ? selection.filter(x => x !== id) : selection.concat(id);
   else selection = [id];
   selectedId = selection.length ? selection[selection.length - 1] : null;
-  const picked = selectedId != null ? byId(selectedId) : null;
-  if (picked && CAT[picked.type] && CAT[picked.type].seatable) $('seats').value = '8';
+  // Tables that just got selected and have no chairs yet get seated automatically.
+  const fresh = selection.filter(x => !before.includes(x)).map(byId)
+    .filter(t => t && CAT[t.type] && CAT[t.type].seatable && !items.some(c => c.parent === t.id));
+  if (fresh.length){ $('seats').value = '8'; fresh.forEach(t => seatTable(t)); }
   refresh();
 }
 
@@ -664,7 +665,10 @@ $('addCustom').addEventListener('click', () => {
 $('btnRotate').addEventListener('click', () => rotateSelected(90));
 $('btnDelete').addEventListener('click', deleteSelected);
 $('btnDeleteSel').addEventListener('click', deleteSelected);
-$('btnSeat').addEventListener('click', () => { selection.forEach(id => seatTable(byId(id))); refresh(); });
+$('seats').addEventListener('change', () => {
+  selection.forEach(id => { const t = byId(id); if (t && CAT[t.type] && CAT[t.type].seatable) seatTable(t); });
+  refresh();
+});
 $('btnUnseat').addEventListener('click', () => {
   const t = byId(selectedId);
   if (!t) return;
