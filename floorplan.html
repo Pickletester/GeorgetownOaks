@@ -986,12 +986,26 @@ function copyText(value, msg){
     .then(text => navigator.clipboard.writeText(text))
     .then(() => toast(msg), () => toast('Could not copy. Select the text and copy it.'));
 }
+const LOGO_URL = 'https://pub-0f567c9a46274b7a94ebd35246fec71d.r2.dev/Images/Georgetown%20Oaks%20logo%20final-Color.png';
+function loadLogo(){
+  return new Promise(res => {
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.onload = () => res(im);
+    im.onerror = () => res(null);
+    im.src = LOGO_URL;
+  });
+}
 async function downloadImage(){
   const code = await layoutCode();
+  const logo = await loadLogo();
   const lines = code.match(/.{1,96}/g) || [];
   const bottom = 58.5 + (lines.length - 1) * 1.3 + 2;
   const vbH = bottom + 4;
   const W_PX = 1600, H_PX = Math.round(1600 * vbH / 82);
+  const logoW = logo ? 4.5 * (logo.naturalWidth / logo.naturalHeight) : 0;
+  const titleX = logo ? -4 + logoW + 1 : -4;
+  const titleText = logo ? 'Main Hall layout' : 'Georgetown Oaks · Main Hall layout';
   const clone = svg.cloneNode(true);
   clone.setAttribute('xmlns', NS);
   clone.removeAttribute('style');
@@ -1002,7 +1016,7 @@ async function downloadImage(){
   const codeText = lines.map((l, i) =>
     `<text x="-4" y="${58.5 + i * 1.3}" font-family="Menlo, Consolas, monospace" font-size="0.9" fill="#2a2f36">${l}</text>`).join('');
   clone.insertAdjacentHTML('beforeend',
-    `<text x="-4" y="54" font-family="system-ui, sans-serif" font-size="1.6" font-weight="700" fill="#2a2f36">Georgetown Oaks · Main Hall layout</text>` +
+    `<text x="${titleX}" y="52.5" font-family="system-ui, sans-serif" font-size="1.6" font-weight="700" fill="#2a2f36">${titleText}</text>` +
     `<text x="-4" y="56" font-family="system-ui, sans-serif" font-size="1.1" fill="#2a2f36">To edit, paste this code in at https://www.georgetownoaks.com/floorplan</text>` + codeText);
   const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)], { type: 'image/svg+xml' }));
   const img = new Image();
@@ -1012,6 +1026,11 @@ async function downloadImage(){
     c.height = H_PX * scale;
     const ctx = c.getContext('2d');
     ctx.drawImage(img, 0, 0, c.width, c.height);
+    const pu = c.width / 82;   // pixels per plan unit
+    if (logo){
+      const lh = 4.5 * pu, lw = lh * (logo.naturalWidth / logo.naturalHeight);
+      ctx.drawImage(logo, 2 * pu, 52.5 * pu - lh + 1.2 * pu, lw, lh);
+    }
     // QR code that opens the builder page when scanned
     if (typeof QRCode !== 'undefined'){
       const holder = document.createElement('div');
