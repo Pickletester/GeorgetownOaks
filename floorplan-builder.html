@@ -45,6 +45,12 @@ label.inline{display:inline-flex;align-items:center;gap:6px;margin:0}
 .notes li{margin-bottom:4px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2a2f36;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw}
 .toast.show{opacity:1}
+.share-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1280px;margin:0 auto;padding:0 20px 40px}
+@media (max-width:900px){.share-wrap{grid-template-columns:1fr;padding:0 16px 32px}}
+.share-card{background:#fff;border:1px solid #ddd6c6;border-radius:12px;padding:18px}
+.share-card h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;margin:0 0 8px;color:#8a6a24}
+.share-card button{margin:6px 6px 6px 0}
+textarea{font:inherit;font-size:13px;padding:6px 8px;border:1px solid #cfc7b4;border-radius:6px;background:#fff;width:100%}
 </style>
 </head>
 <body>
@@ -120,6 +126,42 @@ label.inline{display:inline-flex;align-items:center;gap:6px;margin:0}
       Pick a table, set the seat count, then press <b>Seat table</b>. Pillars, windows, doors and the bar are fixed.
       Dimensions are in feet. Each grid square is 5 ft.
     </p>
+  </section>
+</div>
+
+<div class="share-wrap">
+  <section class="share-card">
+    <h2>Send to our Director of Events</h2>
+    <p class="muted">Morgan will get your layout along with your contact details.</p>
+    <form id="layoutForm">
+      <input type="hidden" name="access_key" value="13e4b698-dbeb-41d8-ade1-de5487dcf74a">
+      <input type="hidden" name="subject" value="Floor plan layout request">
+      <input type="hidden" name="layout_code" id="layoutCodeField">
+      <input type="hidden" name="layout_link" id="layoutLinkField">
+      <label>Name <input name="name" required></label>
+      <label>Email <input name="email" type="email" required></label>
+      <label>Phone <input name="phone" type="tel" required></label>
+      <label>Type of event
+        <select name="event_type" required>
+          <option value="">Choose one</option>
+          <option>Wedding</option>
+          <option>Private event</option>
+          <option>Corporate event</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label>Message <textarea name="message" rows="4"></textarea></label>
+      <button type="submit" id="sendLayout">Send to Director of Events</button>
+      <p id="sendStatus" role="status" class="muted"></p>
+    </form>
+  </section>
+  <section class="share-card">
+    <h2>Your layout code</h2>
+    <p class="muted">Save this code or link. Paste it below any time to open the layout again.</p>
+    <button id="btnCopyCode" class="ghost">Copy layout code</button>
+    <button id="btnCopyLink" class="ghost">Copy link</button>
+    <label style="margin-top:14px">Open a layout <input id="loadCode" placeholder="Paste a layout code"></label>
+    <button id="btnLoadCode" class="ghost">Open layout</button>
   </section>
 </div>
 
@@ -696,6 +738,51 @@ $('btnClear').addEventListener('click', () => {
 
 svg.innerHTML = roomMarkup() + '<g id="items"></g><g id="measure" pointer-events="none"></g>';
 refresh();
+/* ---------- shareable layout code ---------- */
+function encodeLayout(){
+  const data = items.map(i => ({ id:i.id, type:i.type, x:+i.x.toFixed(3), y:+i.y.toFixed(3), rot:i.rot, w:i.w, d:i.d, shape:i.shape, fill:i.fill, label:i.label, parent:i.parent, lx:i.lx, ly:i.ly, lr:i.lr, locked:!!i.locked }));
+  return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+}
+function loadFromCode(code){
+  const data = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+  if (!Array.isArray(data) || !data.length) throw new Error('bad code');
+  items = data;
+  nextId = Math.max(...items.map(i => i.id)) + 1;
+  selection = []; selectedId = null;
+  refresh();
+}
+function layoutLink(){ return location.href.split('#')[0] + '#layout=' + encodeLayout(); }
+function copyText(text, msg){
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast(msg), () => toast('Could not copy. Select the text and copy it.'));
+  else toast('Could not copy here.');
+}
+$('btnLoadCode').addEventListener('click', () => {
+  try { loadFromCode($('loadCode').value); toast('Layout opened.'); }
+  catch (err) { toast('That layout code did not open.'); }
+});
+$('btnCopyCode').addEventListener('click', () => copyText(encodeLayout(), 'Layout code copied.'));
+$('btnCopyLink').addEventListener('click', () => copyText(layoutLink(), 'Link copied.'));
+$('layoutForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target, status = $('sendStatus'), btn = $('sendLayout');
+  $('layoutCodeField').value = encodeLayout();
+  $('layoutLinkField').value = layoutLink();
+  btn.disabled = true;
+  status.textContent = 'Sending...';
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) });
+    const json = await res.json();
+    if (json.success){ status.textContent = 'Sent. Morgan will be in touch. Keep your layout code to come back to this plan.'; form.reset(); }
+    else status.textContent = 'Something went wrong. Please call (412) 914-8298.';
+  } catch (err) {
+    status.textContent = 'Could not send. Please call (412) 914-8298.';
+  }
+  btn.disabled = false;
+});
+if (location.hash.startsWith('#layout=')){
+  try { loadFromCode(location.hash.slice(8)); }
+  catch (err) { toast('That layout link did not open.'); }
+}
 </script>
 </body>
 </html>
