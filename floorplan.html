@@ -1014,7 +1014,7 @@ $('layoutForm').addEventListener('submit', async e => {
   try {
     const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) });
     const json = await res.json();
-    if (json.success){ status.textContent = 'Sent. Morgan will be in touch. Keep your layout code to come back to this plan.'; form.reset(); }
+    if (json.success){ status.textContent = 'Thank you! We\'ve sent you an email with your layout. Morgan will be in touch soon.'; form.reset(); }
     else status.textContent = 'Something went wrong. Please call (412) 914-8298.';
   } catch (err) {
     status.textContent = 'Could not send. Please call (412) 914-8298.';
