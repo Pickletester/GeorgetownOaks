@@ -57,6 +57,13 @@ textarea{font:inherit;font-size:13px;padding:6px 8px;border:1px solid #cfc7b4;bo
 .tgroup .inline{font-size:13px;color:#2a2f36;margin:0}
 .hint{font-size:13px;line-height:1.6}
 section .share-wrap{padding:0;max-width:none;margin-top:24px}
+@media (max-width:900px){ .layout > section{order:-1} }
+@media (max-width:700px){
+  .toolbar{gap:8px}
+  .tgroup{width:100%}
+  button, select{min-height:44px;font-size:15px}
+  .canvas{padding:4px}
+}
 </style>
 </head>
 <body>
@@ -115,8 +122,15 @@ section .share-wrap{padding:0;max-width:none;margin-top:24px}
         <button id="btnRedo" class="ghost" disabled>Redo</button>
         <button id="btnCopy" class="ghost">Copy</button>
         <button id="btnPaste" class="ghost">Paste</button>
+        <button id="btnMulti" class="ghost">Multi-select</button>
         <button id="btnRotate" class="ghost">Rotate 90° (R)</button>
         <button id="btnDelete" class="danger">Delete selected</button>
+      </div>
+      <div class="tgroup">
+        <span class="tlabel">Presets</span>
+        <button id="preset100" class="ghost">100 guests</button>
+        <button id="preset150" class="ghost">150 guests</button>
+        <button id="preset200" class="ghost">200 guests</button>
       </div>
       <div class="tgroup">
         <span class="tlabel">Seating</span>
@@ -556,7 +570,7 @@ svg.addEventListener('pointerdown', e => {
   if (!g){ select(null); return; }
   const it = byId(parseInt(g.dataset.id, 10));
   if (!it) return;
-  if (e.shiftKey) select(it.id, true);
+  if (e.shiftKey || multiMode) select(it.id, true);
   else if (!selection.includes(it.id)) select(it.id);
   if (!selection.includes(it.id) || it.locked) return;
   const p = toFt(e);
@@ -803,6 +817,63 @@ $('btnClear').addEventListener('click', () => {
 
 svg.innerHTML = roomMarkup() + '<g id="items"></g><g id="measure" pointer-events="none"></g>';
 refresh();
+/* ---------- layout presets ---------- */
+const PRESET_SEATS = 10;
+const PRESET_FOOTPRINT = 4.65;
+const PRESET_BLOCKED = [
+  { x: 25.5, y: 14.25, w: 18, h: 18 },  // dance floor
+  { x: 30, y: 6.9, w: 9, h: 4.8 },      // head table
+  { x: 27.4, y: 45.9, w: 6, h: 0.6 },   // double doors
+  { x: 62.8, y: 45.9, w: 4.67, h: 0.6 } // exit
+];
+function presetFits(cx, cy){
+  const R = PRESET_FOOTPRINT;
+  if (cx - R < 2 || cx + R > 67 || cy - R < 4.5 || cy + R > 46) return false;
+  return !PRESET_BLOCKED.some(rc => {
+    const dx = Math.max(Math.abs(cx - (rc.x + rc.w / 2)) - rc.w / 2, 0);
+    const dy = Math.max(Math.abs(cy - (rc.y + rc.h / 2)) - rc.h / 2, 0);
+    return dx * dx + dy * dy < R * R;
+  });
+}
+function presetSpots(){
+  const spots = [];
+  [9.5, 20.1, 30.7, 41.3].forEach(y => [7, 18, 29, 40, 51, 62].forEach(x => { if (presetFits(x, y)) spots.push({ x, y }); }));
+  return spots;
+}
+function buildPreset(guests){
+  const spots = presetSpots();
+  const tablesWanted = Math.ceil(guests / PRESET_SEATS);
+  const use = spots.slice(0, tablesWanted);
+  if (!confirm(`Replace the current floor with a ${guests}-guest layout?`)) return;
+  pushHistory();
+  items = items.filter(i => i.locked);
+  nextId = Math.max(...items.map(i => i.id)) + 1;
+  selection = []; selectedId = null;
+  addItem({ type:'custom', label:'Dance floor', w:18, d:18, rot:0, shape:'rect', fill:'#7b8794', x:34.5, y:23.25 });
+  const head = addItem({ type:'tableA', w:CAT.tableA.w, d:CAT.tableA.d, shape:'rect', fill:CAT.tableA.fill, label:'A', x:34.5, y:8.5, rot:0 });
+  seatSpecs(head, 8).filter(s => s.ly > 0).forEach(s => addItem({ type:'chair', w:CAT.chair.w, d:CAT.chair.d, shape:'rect', parent:head.id, lx:s.lx, ly:s.ly, lr:s.lr }));
+  syncChildren(head);
+  use.forEach(p => {
+    const t = addItem({ type:'round', w:6, d:6, shape:'circle', fill:CAT.round.fill, label:'6 ft', x:p.x, y:p.y, rot:0 });
+    seatSpecs(t, PRESET_SEATS).forEach(s => addItem({ type:'chair', w:CAT.chair.w, d:CAT.chair.d, shape:'rect', parent:t.id, lx:s.lx, ly:s.ly, lr:s.lr }));
+    syncChildren(t);
+  });
+  refresh();
+  if (use.length < tablesWanted){
+    toast(`Only ${use.length} round tables fit with the dance floor (${use.length * PRESET_SEATS} guests). Try 150 or make the dance floor smaller.`);
+  } else {
+    toast(`${guests}-guest layout added. Move anything you like.`);
+  }
+}
+let multiMode = false;
+$('preset100').addEventListener('click', () => buildPreset(100));
+$('preset150').addEventListener('click', () => buildPreset(150));
+$('preset200').addEventListener('click', () => buildPreset(200));
+$('btnMulti').addEventListener('click', () => {
+  multiMode = !multiMode;
+  $('btnMulti').textContent = multiMode ? 'Multi-select: on' : 'Multi-select';
+  $('btnMulti').className = multiMode ? '' : 'ghost';
+});
 /* ---------- shareable layout code ---------- */
 const TYPES = ['tableA','tableB','round','chair','bar','custom','pillar','window','door','fireplace'];
 function toBase64Url(bytes){
