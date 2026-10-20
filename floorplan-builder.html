@@ -22,6 +22,7 @@ header p{margin:4px 0 0;font-size:13px;color:#d9d4c7}
 .inv-count{font-size:12px;color:#6b6f76;margin-top:2px}
 button{font:inherit;font-size:13px;padding:7px 12px;border-radius:8px;border:1px solid #2a2f36;background:#2a2f36;color:#f7f3ea;cursor:pointer;white-space:nowrap}
 button.ghost{background:#fff;color:#2a2f36}
+button.danger{background:#fff;color:#b4312f;border:1px solid #b4312f;font-weight:600}
 button:disabled{opacity:.4;cursor:not-allowed}
 input,select{font:inherit;font-size:13px;padding:6px 8px;border:1px solid #cfc7b4;border-radius:6px;background:#fff;width:100%}
 input[type=checkbox]{width:auto}
@@ -85,6 +86,7 @@ label.inline{display:inline-flex;align-items:center;gap:6px;margin:0}
       <label style="margin-top:12px">Rotation <span id="rotVal" style="float:right"></span>
         <input id="rot" type="range" min="0" max="359" value="0" disabled>
       </label>
+      <button id="btnDeleteSel" class="danger" style="width:100%;margin-top:12px">Delete selected item</button>
     </div>
 
     <div class="card">
@@ -96,7 +98,7 @@ label.inline{display:inline-flex;align-items:center;gap:6px;margin:0}
   <section>
     <div class="toolbar">
       <button id="btnRotate" class="ghost">Rotate 90° (R)</button>
-      <button id="btnDelete" class="ghost">Delete (Del)</button>
+      <button id="btnDelete" class="danger">Delete selected</button>
       <span class="sep"></span>
       <label class="inline">Chairs per table <select id="seats" class="narrow"><option value="8" selected>8</option><option value="9">9</option><option value="10">10</option></select></label>
       <button id="btnSeat" class="ghost">Seat table</button>
@@ -377,6 +379,7 @@ function updateUI(){
   $('btnUnseat').disabled = !seatable;
   $('btnRotate').disabled = !it || it.locked;
   $('btnDelete').disabled = !it || it.locked;
+  $('btnDeleteSel').disabled = !it || it.locked;
   $('rot').disabled = !it || it.locked;
 
   $('selName').textContent = it ? describe(it) : 'Nothing selected.';
@@ -599,6 +602,7 @@ $('addCustom').addEventListener('click', () => {
 
 $('btnRotate').addEventListener('click', () => rotateSelected(90));
 $('btnDelete').addEventListener('click', deleteSelected);
+$('btnDeleteSel').addEventListener('click', deleteSelected);
 $('btnSeat').addEventListener('click', () => { seatTable(byId(selectedId)); refresh(); });
 $('btnUnseat').addEventListener('click', () => {
   const t = byId(selectedId);
