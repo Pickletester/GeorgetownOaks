@@ -820,12 +820,15 @@ refresh();
 /* ---------- layout presets ---------- */
 const PRESET_SEATS = 10;
 const PRESET_FOOTPRINT = 4.65;
-const PRESET_DANCE = { x: 25.5, y: 14.25, w: 18, h: 18 };
+const PRESET_DANCE = { x: 26.5, y: 15.25, w: 16, h: 16 };
 const PRESET_SWEET = { x: 37.5, y: 3.5, w: 3, h: 5.5 };   // sweetheart table with its 2 chairs, below the fireplace
 const PRESET_BLOCKED = [
   PRESET_DANCE, PRESET_SWEET,
   { x: 27.4, y: 45.9, w: 6, h: 0.6 },    // double doors
-  { x: 62.8, y: 45.9, w: 4.67, h: 0.6 }  // exit
+  { x: 62.8, y: 45.9, w: 4.67, h: 0.6 }, // exit
+  { x: 67.2, y: 20.25, w: 2.5, h: 3.5 },  // exit door (right wall)
+  { x: 67.2, y: 40.9, w: 2.5, h: 3.2 },   // storage door (right wall)
+  { x: 62.5, y: 25.5, w: 6.5, h: 15 }     // bar entrance and walkway
 ];
 function presetFits(cx, cy){
   const R = PRESET_FOOTPRINT;
@@ -853,7 +856,7 @@ function buildPreset(guests){
   items = items.filter(i => i.locked);
   nextId = Math.max(...items.map(i => i.id)) + 1;
   selection = []; selectedId = null;
-  addItem({ type:'custom', label:'Dance floor', w:18, d:18, rot:0, shape:'rect', fill:'#7b8794', x:34.5, y:23.25 });
+  addItem({ type:'custom', label:'Dance floor', w:16, d:16, rot:0, shape:'rect', fill:'#7b8794', x:34.5, y:23.25 });
   const sweet = addItem({ type:'custom', label:'Sweetheart', w:3, d:2.5, rot:0, shape:'rect', fill:CAT.tableA.fill, x:39.05, y:5.5 });
   [-0.8, 0.8].forEach(lx => addItem({ type:'chair', w:CAT.chair.w, d:CAT.chair.d, shape:'rect', parent:sweet.id, lx, ly:2.25, lr:180 }));
   syncChildren(sweet);
