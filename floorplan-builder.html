@@ -296,16 +296,6 @@ function roomMarkup(){
   <rect x="${W}" y="25.75" width="9" height="14.33" fill="url(#planks)" pointer-events="none"/>
   <path d="M ${W} 25.75 L ${W+9} 25.75 L ${W+9} 40.08 L ${W} 40.08" fill="none" stroke="#2a2f36" stroke-width="5" vector-effect="non-scaling-stroke" pointer-events="none"/>
   <text x="${W+4.5}" y="24.7" text-anchor="middle" font-size="1" fill="#2a2f36" pointer-events="none">Bar room</text>
-  <g stroke="#2a2f36" stroke-width="1" fill="#2a2f36" vector-effect="non-scaling-stroke" pointer-events="none">
-    <line x1="0" y1="-1.6" x2="${W}" y2="-1.6"/>
-    <line x1="0" y1="-2.1" x2="0" y2="-1.1"/>
-    <line x1="${W}" y1="-2.1" x2="${W}" y2="-1.1"/>
-    <line x1="${W+1.6}" y1="0" x2="${W+1.6}" y2="${D}"/>
-    <line x1="${W+1.1}" y1="0" x2="${W+2.1}" y2="0"/>
-    <line x1="${W+1.1}" y1="${D}" x2="${W+2.1}" y2="${D}"/>
-  </g>
-  <text x="${W/2}" y="-2.4" text-anchor="middle" font-size="1.4" fill="#2a2f36" pointer-events="none">69 ft</text>
-  <text transform="translate(${W+2.9} ${D/2}) rotate(90)" text-anchor="middle" font-size="1.4" fill="#2a2f36" pointer-events="none">46.5 ft</text>
   <g font-size="0.9" fill="#2a2f36" text-anchor="middle" pointer-events="none" opacity=".75">
     ${FIXED.filter(f => f.type === 'pillar').map(p => p.rot ? `<text x="-1.2" y="${p.y}" text-anchor="end" dominant-baseline="central">Pillar</text>` : `<text x="${p.x}" y="-0.5" text-anchor="middle">Pillar</text>`).join('')}
   </g>`;
