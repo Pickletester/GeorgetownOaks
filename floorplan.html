@@ -846,9 +846,16 @@ function presetSpots(withDance){
   const cx = 34.5, cy = 23.25;   // room centre
   return spots.sort((a, b) => Math.hypot(a.x - cx, a.y - cy) - Math.hypot(b.x - cx, b.y - cy));
 }
+// The 150-guest layout, as drawn by hand (table centres in feet).
+const PRESET_150 = [
+  { x: 7.1, y: 9.3 }, { x: 18.1, y: 9.3 }, { x: 29.0, y: 9.3 }, { x: 50.9, y: 9.3 }, { x: 61.8, y: 9.3 },
+  { x: 7.1, y: 19.9 }, { x: 18.1, y: 19.9 }, { x: 50.9, y: 19.9 }, { x: 61.8, y: 19.9 },
+  { x: 7.1, y: 30.4 }, { x: 18.1, y: 30.4 }, { x: 50.9, y: 30.4 }, { x: 61.8, y: 30.4 },
+  { x: 7.6, y: 40.4 }, { x: 18.5, y: 40.4 }
+];
 function buildPreset(guests){
   const withDance = guests < 200;   // the 200-guest layout drops the dance floor
-  const spots = presetSpots(withDance);
+  const spots = guests === 150 ? PRESET_150 : presetSpots(withDance);
   const tablesWanted = Math.ceil(guests / PRESET_SEATS);
   const use = spots.slice(0, tablesWanted);
   if (!confirm(`Replace the current floor with a ${guests}-guest layout?`)) return;
