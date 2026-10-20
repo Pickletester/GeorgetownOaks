@@ -828,25 +828,27 @@ const PRESET_BLOCKED = [
   { x: 67.2, y: 40.9, w: 2.5, h: 3.2 },   // storage door (right wall)
   { x: 67, y: 25.5, w: 2, h: 15 }         // bar entrance (wall side)
 ];
-function presetFits(cx, cy){
+function presetFits(cx, cy, withDance){
+  const blocks = withDance ? [PRESET_DANCE].concat(PRESET_BLOCKED) : PRESET_BLOCKED;
   const R = PRESET_FOOTPRINT;
   if (cx - R < 2 || cx + R > 67 || cy - R < 4.5 || cy + R > 46) return false;
-  return !PRESET_BLOCKED.some(rc => {
+  return !blocks.some(rc => {
     const dx = Math.max(Math.abs(cx - (rc.x + rc.w / 2)) - rc.w / 2, 0);
     const dy = Math.max(Math.abs(cy - (rc.y + rc.h / 2)) - rc.h / 2, 0);
     return dx * dx + dy * dy < R * R;
   });
 }
-function presetSpots(){
+function presetSpots(withDance){
   // Four even rows of tables around the dance floor, nearest the dance floor first.
   const rows = [9.25, 19.85, 30.45, 41.05], cols = [7, 18, 29, 40, 51, 62];
   const spots = [];
-  rows.forEach(y => cols.forEach(x => { if (presetFits(x, y)) spots.push({ x, y }); }));
+  rows.forEach(y => cols.forEach(x => { if (presetFits(x, y, withDance)) spots.push({ x, y }); }));
   const cx = 34.5, cy = 23.25;   // room centre
   return spots.sort((a, b) => Math.hypot(a.x - cx, a.y - cy) - Math.hypot(b.x - cx, b.y - cy));
 }
 function buildPreset(guests){
-  const spots = presetSpots();
+  const withDance = guests < 200;   // the 200-guest layout drops the dance floor
+  const spots = presetSpots(withDance);
   const tablesWanted = Math.ceil(guests / PRESET_SEATS);
   const use = spots.slice(0, tablesWanted);
   if (!confirm(`Replace the current floor with a ${guests}-guest layout?`)) return;
@@ -854,6 +856,7 @@ function buildPreset(guests){
   items = items.filter(i => i.locked);
   nextId = Math.max(...items.map(i => i.id)) + 1;
   selection = []; selectedId = null;
+  if (withDance) addItem({ type:'custom', label:'Dance floor', w:16, d:16, rot:0, shape:'rect', fill:'#7b8794', x:34.5, y:23.25 });
   const sweet = addItem({ type:'custom', label:'Sweetheart', w:3, d:2.5, rot:0, shape:'rect', fill:CAT.tableA.fill, x:39.05, y:5.5 });
   [-0.8, 0.8].forEach(lx => addItem({ type:'chair', w:CAT.chair.w, d:CAT.chair.d, shape:'rect', parent:sweet.id, lx, ly:2.25, lr:180 }));
   syncChildren(sweet);
