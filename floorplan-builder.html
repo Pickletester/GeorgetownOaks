@@ -837,16 +837,12 @@ function presetFits(cx, cy){
   });
 }
 function presetSpots(){
-  const R = PRESET_FOOTPRINT, acc = [];
-  for (let y = 4.5 + R; y <= 46 - R + 1e-6; y += 0.25)
-    for (let x = 2 + R; x <= 67 - R + 1e-6; x += 0.25) {
-      if (!presetFits(x, y)) continue;
-      if (acc.some(p => Math.hypot(p.x - x, p.y - y) < 2 * R + 0.2)) continue;
-      acc.push({ x: +x.toFixed(2), y: +y.toFixed(2) });
-    }
-  // Closest to the dance floor first, so smaller events cluster around it.
+  // Four even rows of tables around the dance floor, nearest the dance floor first.
+  const rows = [9.25, 19.85, 30.45, 41.05], cols = [7, 18, 29, 40, 51, 62];
+  const spots = [];
+  rows.forEach(y => cols.forEach(x => { if (presetFits(x, y)) spots.push({ x, y }); }));
   const cx = PRESET_DANCE.x + PRESET_DANCE.w / 2, cy = PRESET_DANCE.y + PRESET_DANCE.h / 2;
-  return acc.sort((a, b) => Math.hypot(a.x - cx, a.y - cy) - Math.hypot(b.x - cx, b.y - cy));
+  return spots.sort((a, b) => Math.hypot(a.x - cx, a.y - cy) - Math.hypot(b.x - cx, b.y - cy));
 }
 function buildPreset(guests){
   const spots = presetSpots();
@@ -868,7 +864,7 @@ function buildPreset(guests){
   });
   refresh();
   if (use.length < tablesWanted){
-    toast(`Only ${use.length} round tables fit (${use.length * PRESET_SEATS} guests). Try a smaller dance floor.`);
+    toast(`The room fits ${use.length} round tables neatly (${use.length * PRESET_SEATS} guests). For more, use a smaller dance floor.`);
   } else {
     toast(`${guests}-guest layout added. Move anything you like.`);
   }
