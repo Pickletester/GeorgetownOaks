@@ -291,17 +291,9 @@ function setRot(it, deg){
   syncChildren(it);
 }
 
-function seatTable(t){
-  if (!t || !CAT[t.type] || !CAT[t.type].seatable) return;
-
-  // Return any existing chairs to the pool first.
-  items = items.filter(i => !(i.type === 'chair' && i.parent === t.id));
-
-  const want = Math.max(1, Math.min(40, parseInt($('seats').value, 10) || 8));
-  const n = Math.min(want, remaining('chair'));
-  const cW = CAT.chair.w, cD = CAT.chair.d;
+function seatSpecs(t, n){
+  const cD = CAT.chair.d;
   const specs = [];
-
   if (t.shape === 'circle'){
     const Rc = t.w / 2 + 0.35 + cD / 2;
     for (let k = 0; k < n; k++){
@@ -319,6 +311,18 @@ function seatTable(t){
       }
     });
   }
+  return specs;
+}
+
+function seatTable(t){
+  if (!t || !CAT[t.type] || !CAT[t.type].seatable) return;
+
+  // Return any existing chairs to the pool first.
+  items = items.filter(i => !(i.type === 'chair' && i.parent === t.id));
+
+  const want = Math.max(1, Math.min(40, parseInt($('seats').value, 10) || 8));
+  const n = Math.min(want, remaining('chair'));
+  const specs = seatSpecs(t, n);
 
   specs.forEach(s => addItem({ type:'chair', w:cW, d:cD, shape:'rect', parent:t.id, lx:s.lx, ly:s.ly, lr:s.lr }));
   syncChildren(t);
@@ -813,18 +817,36 @@ async function inflateBytes(bytes){
   const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
   return await new Response(stream).text();
 }
+function seatKey(s){ return `${(+s.lx).toFixed(3)},${(+s.ly).toFixed(3)},${(((+s.lr) % 360 + 360) % 360).toFixed(3)}`; }
+function seatingMatches(t, kids){
+  const specs = seatSpecs(t, kids.length);
+  const want = specs.map(seatKey).sort().join('|');
+  const have = kids.map(seatKey).sort().join('|');
+  return want === have;
+}
 async function layoutCode(){
-  const rows = items.map(i => [
+  // Seated tables store only their chair count; chairs that sit on the normal pattern are rebuilt on open.
+  const hidden = new Set();
+  const seatsOf = {};
+  items.forEach(t => {
+    if (!(CAT[t.type] && CAT[t.type].seatable)) return;
+    const kids = items.filter(c => c.type === 'chair' && c.parent === t.id);
+    if (kids.length && seatingMatches(t, kids)){
+      seatsOf[t.id] = kids.length;
+      kids.forEach(c => hidden.add(c.id));
+    }
+  });
+  const rows = items.filter(i => !hidden.has(i.id)).map(i => [
     i.id, TYPES.indexOf(i.type), +i.x.toFixed(2), +i.y.toFixed(2), Math.round(i.rot),
     +i.w.toFixed(3), +i.d.toFixed(3), i.shape === 'circle' ? 1 : 0, i.fill, i.label || '',
     i.parent == null ? 0 : i.parent, +(i.lx || 0).toFixed(2), +(i.ly || 0).toFixed(2),
-    Math.round(i.lr || 0), i.locked ? 1 : 0
+    Math.round(i.lr || 0), i.locked ? 1 : 0, seatsOf[i.id] || 0
   ]);
-  return 'g1.' + toBase64Url(await deflateBytes(JSON.stringify(rows)));
+  return 'g2.' + toBase64Url(await deflateBytes(JSON.stringify(rows)));
 }
 async function loadFromCode(code){
   code = code.trim();
-  if (!code.startsWith('g1.')) throw new Error('unknown code');
+  if (!code.startsWith('g2.')) throw new Error('unknown code');
   const rows = JSON.parse(await inflateBytes(fromBase64Url(code.slice(3))));
   const next = rows.map(r => ({
     id: r[0], type: TYPES[r[1]], x: r[2], y: r[3], rot: r[4], w: r[5], d: r[6],
@@ -832,9 +854,19 @@ async function loadFromCode(code){
     lx: r[11], ly: r[12], lr: r[13], locked: !!r[14]
   }));
   if (!next.length || next.some(i => !i.type)) throw new Error('bad code');
+  let cid = Math.max(...next.map(i => i.id)) + 1;
+  rows.forEach(r => {
+    if (!r[14 + 1]) return;
+    const t = next.find(i => i.id === r[0]);
+    seatSpecs(t, r[15]).forEach(s => next.push({
+      id: cid++, type: 'chair', x: t.x, y: t.y, rot: t.rot, w: CAT.chair.w, d: CAT.chair.d,
+      shape: 'rect', fill: '#7b8794', label: '', parent: t.id, lx: s.lx, ly: s.ly, lr: s.lr, locked: false
+    }));
+  });
   pushHistory();
   items = next;
-  nextId = Math.max(...items.map(i => i.id)) + 1;
+  items.forEach(t => { if (CAT[t.type] && CAT[t.type].seatable) syncChildren(t); });
+  nextId = cid;
   selection = []; selectedId = null;
   refresh();
 }
