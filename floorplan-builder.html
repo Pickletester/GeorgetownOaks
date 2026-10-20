@@ -51,6 +51,11 @@ label.inline{display:inline-flex;align-items:center;gap:6px;margin:0}
 .share-card h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;margin:0 0 8px;color:#8a6a24}
 .share-card button{margin:6px 6px 6px 0}
 textarea{font:inherit;font-size:13px;padding:6px 8px;border:1px solid #cfc7b4;border-radius:6px;background:#fff;width:100%}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.tgroup{background:#fff;border:1px solid #ddd6c6;border-radius:10px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tlabel{width:100%;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#8a6a24;margin-bottom:2px}
+.tgroup .inline{font-size:13px;color:#2a2f36;margin:0}
+.hint{font-size:13px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -103,31 +108,38 @@ textarea{font:inherit;font-size:13px;padding:6px 8px;border:1px solid #cfc7b4;bo
 
   <section>
     <div class="toolbar">
-      <button id="btnRotate" class="ghost">Rotate 90° (R)</button>
-      <button id="btnDelete" class="danger">Delete selected</button>
-      <span class="sep"></span>
-      <label class="inline">Chairs per table <select id="seats" class="narrow"><option value="6">6</option><option value="7">7</option><option value="8" selected>8</option><option value="9">9</option><option value="10">10</option></select></label>
-      <button id="btnUnseat" class="ghost">Clear its chairs</button>
-      <span class="sep"></span>
-      <label class="inline"><input id="snap" type="checkbox" checked> Snap to 6 in</label>
-      <span class="sep"></span>
-      <button id="btnSave" class="ghost">Save</button>
-      <button id="btnLoad" class="ghost">Load</button>
-      <button id="btnSvg" class="ghost">Download SVG</button>
-      <button id="btnUndo" class="ghost" disabled>Undo</button>
-      <button id="btnRedo" class="ghost" disabled>Redo</button>
-      <button id="btnMeasure" class="ghost">Measure</button>
-      <button id="btnClear" class="ghost">Clear floor</button>
+      <div class="tgroup">
+        <span class="tlabel">Edit</span>
+        <button id="btnUndo" class="ghost" disabled>Undo</button>
+        <button id="btnRedo" class="ghost" disabled>Redo</button>
+        <button id="btnCopy" class="ghost">Copy</button>
+        <button id="btnPaste" class="ghost">Paste</button>
+        <button id="btnRotate" class="ghost">Rotate 90° (R)</button>
+        <button id="btnDelete" class="danger">Delete selected</button>
+      </div>
+      <div class="tgroup">
+        <span class="tlabel">Seating</span>
+        <label class="inline">Chairs per table <select id="seats" class="narrow"><option value="6">6</option><option value="7">7</option><option value="8" selected>8</option><option value="9">9</option><option value="10">10</option></select></label>
+        <button id="btnUnseat" class="ghost">Clear its chairs</button>
+      </div>
+      <div class="tgroup">
+        <span class="tlabel">Plan</span>
+        <label class="inline"><input id="snap" type="checkbox" checked> Snap to 6 in</label>
+        <button id="btnMeasure" class="ghost">Measure</button>
+        <button id="btnClear" class="ghost">Clear floor</button>
+      </div>
+      <div class="tgroup">
+        <span class="tlabel">File</span>
+        <button id="btnSave" class="ghost">Save</button>
+        <button id="btnLoad" class="ghost">Load</button>
+        <button id="btnSvg" class="ghost">Download SVG</button>
+      </div>
     </div>
 
     <div class="canvas">
       <svg id="plan" viewBox="-6 -4 92 55" role="img" aria-label="Main Hall floor plan, 69 by 46.5 feet"></svg>
     </div>
-    <p class="hint">
-      Drag items to move them. Tables carry their chairs with them. Drag a chair off a table to detach it.
-      Pick a table, set the seat count, then press <b>Seat table</b>. Pillars, windows, doors and the bar are fixed.
-      Dimensions are in feet. Each grid square is 5 ft.
-    </p>
+    <p class="hint">Click an item to select it, or shift-click to pick several. Drag to move. Tables seat 8 chairs automatically when selected. Pillars, windows, doors and the bar are fixed.</p>
   </section>
 </div>
 
@@ -775,6 +787,8 @@ $('btnSave').addEventListener('click', save);
 $('btnLoad').addEventListener('click', load);
 $('btnSvg').addEventListener('click', downloadSvg);
 $('btnUndo').addEventListener('click', undo);
+$('btnCopy').addEventListener('click', copySelected);
+$('btnPaste').addEventListener('click', pasteClipboard);
 $('btnRedo').addEventListener('click', redo);
 $('btnMeasure').addEventListener('click', () => setMeasuring(!measuring));
 $('btnClear').addEventListener('click', () => {
