@@ -56,6 +56,7 @@ textarea{font:inherit;font-size:13px;padding:6px 8px;border:1px solid #cfc7b4;bo
 .tlabel{width:100%;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#8a6a24;margin-bottom:2px}
 .tgroup .inline{font-size:13px;color:#2a2f36;margin:0}
 .hint{font-size:13px;line-height:1.6}
+section .share-wrap{padding:0;max-width:none;margin-top:24px}
 </style>
 </head>
 <body>
@@ -134,43 +135,42 @@ textarea{font:inherit;font-size:13px;padding:6px 8px;border:1px solid #cfc7b4;bo
       <svg id="plan" viewBox="-6 -4 92 55" role="img" aria-label="Main Hall floor plan, 69 by 46.5 feet"></svg>
     </div>
     <p class="hint">Click an item to select it, or shift-click to pick several. Drag to move. Tables seat 8 chairs automatically when selected. Pillars, windows, doors and the bar are fixed.</p>
-  </section>
-</div>
-
-<div class="share-wrap">
-  <section class="share-card">
-    <h2>Send to our Director of Events</h2>
-    <p class="muted">Morgan will get your layout along with your contact details.</p>
-    <form id="layoutForm">
-      <input type="hidden" name="access_key" value="13e4b698-dbeb-41d8-ade1-de5487dcf74a">
-      <input type="hidden" name="subject" value="Floor plan layout request">
-      <input type="hidden" name="layout_code" id="layoutCodeField">
-      <input type="hidden" name="layout_link" id="layoutLinkField">
-      <label>Name <input name="name" required></label>
-      <label>Email <input name="email" type="email" required></label>
-      <label>Phone <input name="phone" type="tel" required></label>
-      <label>Type of event
-        <select name="event_type" required>
-          <option value="">Choose one</option>
-          <option>Wedding</option>
-          <option>Private event</option>
-          <option>Corporate event</option>
-          <option>Other</option>
-        </select>
-      </label>
-      <label>Message <textarea name="message" rows="4"></textarea></label>
-      <button type="submit" id="sendLayout">Send to Director of Events</button>
-      <p id="sendStatus" role="status" class="muted"></p>
-    </form>
-  </section>
-  <section class="share-card">
-    <h2>Your layout code</h2>
-    <p class="muted">Save this code or link. Paste it below any time to open the layout again.</p>
-    <button id="btnCopyCode" class="ghost">Copy layout code</button>
-    <button id="btnCopyLink" class="ghost">Copy link</button>
-    <button id="btnImage" class="ghost">Download image</button>
-    <label style="margin-top:14px">Open a layout <input id="loadCode" placeholder="Paste a layout code"></label>
-    <button id="btnLoadCode" class="ghost">Open layout</button>
+  <div class="share-wrap">
+    <section class="share-card">
+      <h2>Send to our Director of Events</h2>
+      <p class="muted">Morgan will get your layout along with your contact details.</p>
+      <form id="layoutForm">
+        <input type="hidden" name="access_key" value="13e4b698-dbeb-41d8-ade1-de5487dcf74a">
+        <input type="hidden" name="subject" value="Floor plan layout request">
+        <input type="hidden" name="layout_code" id="layoutCodeField">
+        <input type="hidden" name="layout_link" id="layoutLinkField">
+        <label>Name <input name="name" required></label>
+        <label>Email <input name="email" type="email" required></label>
+        <label>Phone <input name="phone" type="tel" required></label>
+        <label>Type of event
+          <select name="event_type" required>
+            <option value="">Choose one</option>
+            <option>Wedding</option>
+            <option>Private event</option>
+            <option>Corporate event</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label>Message <textarea name="message" rows="4"></textarea></label>
+        <button type="submit" id="sendLayout">Send to Director of Events</button>
+        <p id="sendStatus" role="status" class="muted"></p>
+      </form>
+    </section>
+    <section class="share-card">
+      <h2>Your layout code</h2>
+      <p class="muted">Save this code or link. Paste it below any time to open the layout again.</p>
+      <button id="btnCopyCode" class="ghost">Copy layout code</button>
+      <button id="btnCopyLink" class="ghost">Copy link</button>
+      <button id="btnImage" class="ghost">Download image</button>
+      <label style="margin-top:14px">Open a layout <input id="loadCode" placeholder="Paste a layout code"></label>
+      <button id="btnLoadCode" class="ghost">Open layout</button>
+    </section>
+  </div>
   </section>
 </div>
 
