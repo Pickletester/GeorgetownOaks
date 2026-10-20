@@ -132,9 +132,9 @@ section .share-wrap{padding:0;max-width:none;margin-top:24px}
       </div>
       <div class="tgroup">
         <span class="tlabel">Presets</span>
-        <button id="preset100" class="ghost">24 guests</button>
-        <button id="preset150" class="ghost">40 guests</button>
-        <button id="preset200" class="ghost">56 guests</button>
+        <button id="preset100" class="ghost">100 guests</button>
+        <button id="preset150" class="ghost">150 guests</button>
+        <button id="preset200" class="ghost">200 guests</button>
       </div>
       <div class="tgroup">
         <span class="tlabel">Seating</span>
@@ -815,7 +815,7 @@ $('btnClear').addEventListener('click', () => {
 svg.innerHTML = roomMarkup() + '<g id="items"></g><g id="measure" pointer-events="none"></g>';
 refresh();
 /* ---------- layout presets ---------- */
-const PRESET_SEATS = 8;
+const PRESET_SEATS = 10;
 const PRESET_FOOTPRINT = 4.65;
 const PRESET_DANCE = { x: 26.5, y: 15.25, w: 16, h: 16 };
 const PRESET_SWEET = { x: 37.5, y: 3.5, w: 3, h: 5.5 };   // sweetheart table with its 2 chairs, below the fireplace
@@ -838,8 +838,10 @@ function presetFits(cx, cy){
   });
 }
 function presetSpots(){
-  // Comfortable spacing: 8 seats per table, 5 ft aisles, 4 ft clear of the dance floor.
-  const spots = [{ x: 8.7, y: 11.7 }, { x: 51.6, y: 11.7 }, { x: 8.7, y: 26 }, { x: 51.6, y: 26 }, { x: 8.7, y: 40.3 }, { x: 23, y: 40.3 }, { x: 37.3, y: 40.3 }];
+  // Four even rows of tables around the dance floor, nearest the dance floor first.
+  const rows = [9.25, 19.85, 30.45, 41.05], cols = [7, 18, 29, 40, 51, 62];
+  const spots = [];
+  rows.forEach(y => cols.forEach(x => { if (presetFits(x, y)) spots.push({ x, y }); }));
   const cx = PRESET_DANCE.x + PRESET_DANCE.w / 2, cy = PRESET_DANCE.y + PRESET_DANCE.h / 2;
   return spots.sort((a, b) => Math.hypot(a.x - cx, a.y - cy) - Math.hypot(b.x - cx, b.y - cy));
 }
@@ -863,15 +865,15 @@ function buildPreset(guests){
   });
   refresh();
   if (use.length < tablesWanted){
-    toast(`The room fits ${use.length} round tables with comfortable aisles (${use.length * PRESET_SEATS} guests).`);
+    toast(`The room fits ${use.length} round tables neatly (${use.length * PRESET_SEATS} guests). For more, use a smaller dance floor.`);
   } else {
     toast(`${guests}-guest layout added. Move anything you like.`);
   }
 }
 let multiMode = false;
-$('preset100').addEventListener('click', () => buildPreset(24));
-$('preset150').addEventListener('click', () => buildPreset(40));
-$('preset200').addEventListener('click', () => buildPreset(56));
+$('preset100').addEventListener('click', () => buildPreset(100));
+$('preset150').addEventListener('click', () => buildPreset(150));
+$('preset200').addEventListener('click', () => buildPreset(200));
 /* ---------- shareable layout code ---------- */
 const TYPES = ['tableA','tableB','round','chair','bar','custom','pillar','window','door','fireplace'];
 function toBase64Url(bytes){
