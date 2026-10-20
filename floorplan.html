@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link rel="icon" href="/assets/favicon.png" type="image/png">
 <title>Georgetown Oaks · Floor Plan Builder</title>
 <style>
@@ -973,7 +974,19 @@ async function downloadImage(){
     const scale = 2, c = document.createElement('canvas');
     c.width = W_PX * scale;
     c.height = H_PX * scale;
-    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    const ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    // QR code that opens the builder page when scanned
+    if (typeof QRCode !== 'undefined'){
+      const holder = document.createElement('div');
+      new QRCode(holder, { text: 'https://www.georgetownoaks.com/floorplan', width: 240, height: 240, correctLevel: QRCode.CorrectLevel.M });
+      const qr = holder.querySelector('canvas');
+      if (qr){
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(c.width - 300, c.height - 300, 280, 280);
+        ctx.drawImage(qr, c.width - 290, c.height - 290, 260, 260);
+      }
+    }
     c.toBlob(blob => {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
