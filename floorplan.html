@@ -180,8 +180,6 @@ section .share-wrap{padding:0;max-width:none;margin-top:24px}
     <section class="share-card">
       <h2>Your layout code</h2>
       <p class="muted">Save this code or link. Paste it below any time to open the layout again.</p>
-      <button id="btnCopyCode" class="ghost">Copy layout code</button>
-      <button id="btnCopyLink" class="ghost">Copy link</button>
       <button id="btnImage" class="ghost">Download image</button>
       <textarea id="codeBox" readonly rows="3" onclick="this.select()" style="font-family:Menlo,Consolas,monospace;font-size:11px;margin-bottom:12px"></textarea>
     <label style="margin-top:14px">Open a layout <input id="loadCode" placeholder="Paste a layout code"></label>
@@ -1002,8 +1000,6 @@ $('btnLoadCode').addEventListener('click', async () => {
   try { await loadFromCode($('loadCode').value); toast('Layout opened.'); }
   catch (err) { toast('That layout code did not open.'); }
 });
-$('btnCopyCode').addEventListener('click', () => copyText(layoutCode(), 'Layout code copied.'));
-$('btnCopyLink').addEventListener('click', () => copyText(layoutLink(), 'Link copied.'));
 $('btnImage').addEventListener('click', downloadImage);
 function showThanks(form){
   const card = form.closest('section');
