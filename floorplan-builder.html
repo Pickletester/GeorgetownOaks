@@ -207,7 +207,7 @@ const CAT = {
 // Fixed elements. The window wall is the LEFT edge (x = 0), the 46.5 ft side, doors at the top corner.
 // Sizes and gaps follow the photo labels. The last pillar is pinned to the corner, 2.6 ft short of its 14.58 ft gap.
 const FIXED = [
-  { type:'door',   x:65.17, y:46.2, w:4.67, d:0.6, fill:'#9aa3ad', label:'Exit 56in' },
+  { type:'door',   x:65.17, y:46.2, w:4.67, d:0.6, fill:'#9aa3ad', label:'Kitchen door' },
   { type:'door',   x:30.4, y:46.2, w:6, d:0.6, fill:'#c8a24a', label:'Double doors' },
   { type:'door',   x:68.7, y:42.42, w:3, d:0.6, rot:90, fill:'#c8b08a', label:'Storage' },
   { type:'door',   x:68.7, y:21.75, w:3, d:0.6, rot:90, fill:'#9aa3ad', label:'Exit door' },
@@ -825,7 +825,8 @@ const PRESET_SWEET = { x: 37.5, y: 3.5, w: 3, h: 5.5 };   // sweetheart table wi
 const PRESET_BLOCKED = [
   PRESET_DANCE, PRESET_SWEET,
   { x: 27.4, y: 45.9, w: 6, h: 0.6 },    // double doors
-  { x: 62.8, y: 45.9, w: 4.67, h: 0.6 }, // exit
+  { x: 62.8, y: 45.9, w: 4.67, h: 0.6 }, // kitchen door
+  { x: 55, y: 36, w: 14, h: 10.5 },      // kitchen (estimated)
   { x: 67.2, y: 20.25, w: 2.5, h: 3.5 },  // exit door (right wall)
   { x: 67.2, y: 40.9, w: 2.5, h: 3.2 },   // storage door (right wall)
   { x: 67, y: 25.5, w: 2, h: 15 }         // bar entrance (wall side)
