@@ -220,6 +220,7 @@ function addStandard(type){
     label: c.short
   });
   select(it.id);
+  if (c.seatable){ seatTable(it); refresh(); }
 }
 
 // Keep each table's chairs in place relative to the table.
@@ -506,11 +507,46 @@ svg.addEventListener('pointercancel', endDrag);
 
 document.addEventListener('keydown', e => {
   if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+  if ((e.metaKey || e.ctrlKey) && (e.key === 'c' || e.key === 'C')){ copySelected(); return; }
+  if ((e.metaKey || e.ctrlKey) && (e.key === 'v' || e.key === 'V')){ e.preventDefault(); pasteClipboard(); return; }
   if (selectedId == null) return;
   if (e.key === 'Delete' || e.key === 'Backspace'){ e.preventDefault(); deleteSelected(); }
   else if (e.key === 'r' || e.key === 'R'){ rotateSelected(90); }
   else if (e.key === 'Escape'){ select(null); }
 });
+
+let clipboard = null;
+function copySelected(){
+  const it = byId(selectedId);
+  if (!it || it.locked) return;
+  clipboard = { root: Object.assign({}, it), kids: items.filter(i => i.parent === it.id).map(k => Object.assign({}, k)) };
+  toast('Copied.');
+}
+function pasteClipboard(){
+  if (!clipboard) return;
+  const src = clipboard.root;
+  const cat = CAT[src.type];
+  if (cat && countType(src.type) >= cat.limit){ toast(`No ${cat.name} left to place.`); return; }
+  const props = Object.assign({}, src);
+  delete props.id;
+  props.x = src.x + 2;
+  props.y = src.y + 2;
+  props.parent = null;
+  props.locked = false;
+  const it = addItem(props);
+  let placed = 0;
+  clipboard.kids.forEach(k => {
+    if (remaining('chair') <= 0) return;
+    const c = Object.assign({}, k);
+    delete c.id;
+    c.parent = it.id;
+    addItem(c);
+    placed++;
+  });
+  syncChildren(it);
+  select(it.id);
+  if (placed < clipboard.kids.length) toast(`Pasted ${placed} of ${clipboard.kids.length} chairs. No more chairs left.`);
+}
 
 function rotateSelected(delta){
   const it = byId(selectedId);
