@@ -572,6 +572,20 @@ svg.addEventListener('pointerdown', e => {
   e.preventDefault();
 });
 
+// Footprint used for pillar collisions: tables include their chairs.
+function footprintHalf(m){
+  if (m.type === 'round') return [4.65, 4.65];
+  const [hx, hy] = halfExtents(m);
+  return CAT[m.type] && CAT[m.type].seatable ? [hx + 1.3, hy + 1.3] : [hx, hy];
+}
+function pillarHit(m, x, y){
+  const [hx, hy] = footprintHalf(m);
+  return items.some(p => {
+    if (p.type !== 'pillar' || p.id === m.id) return false;
+    const [px, py] = halfExtents(p);
+    return Math.abs(p.x - x) < px + hx && Math.abs(p.y - y) < py + hy;
+  });
+}
 svg.addEventListener('pointermove', e => {
   if (measuringDrag && measure){
     const p = toFt(e);
@@ -599,6 +613,13 @@ svg.addEventListener('pointermove', e => {
     dx = Math.min(Math.max(dx, hx - s.x), W - hx - s.x);
     dy = Math.min(Math.max(dy, hy - s.y), D - hy - s.y);
   });
+  // Stop items from moving onto a pillar; sliding along it is still allowed.
+  const hitsPillar = (ddx, ddy) => movers.some(s => pillarHit(byId(s.id), s.x + ddx, s.y + ddy));
+  if (!hitsPillar(0, 0) && hitsPillar(dx, dy)){
+    if (!hitsPillar(dx, 0)) dy = 0;
+    else if (!hitsPillar(0, dy)) dx = 0;
+    else { dx = 0; dy = 0; }
+  }
   movers.forEach(s => {
     const m = byId(s.id);
     if (m.type === 'chair') m.parent = null;
