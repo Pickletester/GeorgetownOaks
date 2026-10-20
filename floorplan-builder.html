@@ -325,7 +325,7 @@ function seatTable(t){
   const n = Math.min(want, remaining('chair'));
   const specs = seatSpecs(t, n);
 
-  specs.forEach(s => addItem({ type:'chair', w:cW, d:cD, shape:'rect', parent:t.id, lx:s.lx, ly:s.ly, lr:s.lr }));
+  specs.forEach(s => addItem({ type:'chair', w:CAT.chair.w, d:CAT.chair.d, shape:'rect', parent:t.id, lx:s.lx, ly:s.ly, lr:s.lr }));
   syncChildren(t);
 
   if (n < want) toast(`Only ${n} chairs left. Seated ${n} of ${want}.`);
