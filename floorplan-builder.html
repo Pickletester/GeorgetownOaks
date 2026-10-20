@@ -100,7 +100,7 @@ label.inline{display:inline-flex;align-items:center;gap:6px;margin:0}
       <button id="btnRotate" class="ghost">Rotate 90° (R)</button>
       <button id="btnDelete" class="danger">Delete selected</button>
       <span class="sep"></span>
-      <label class="inline">Chairs per table <select id="seats" class="narrow"><option value="8" selected>8</option><option value="9">9</option><option value="10">10</option></select></label>
+      <label class="inline">Chairs per table <select id="seats" class="narrow"><option value="6">6</option><option value="7">7</option><option value="8" selected>8</option><option value="9">9</option><option value="10">10</option></select></label>
       <button id="btnSeat" class="ghost">Seat table</button>
       <button id="btnUnseat" class="ghost">Clear its chairs</button>
       <span class="sep"></span>
@@ -403,6 +403,8 @@ function refresh(){ render(); updateUI(); }
 
 function select(id){
   selectedId = id;
+  const picked = id != null ? byId(id) : null;
+  if (picked && CAT[picked.type] && CAT[picked.type].seatable) $('seats').value = '8';
   refresh();
 }
 
