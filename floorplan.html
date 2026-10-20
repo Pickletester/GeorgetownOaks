@@ -66,6 +66,8 @@ section .share-wrap{padding:0;max-width:none;margin-top:24px}
   button, select{min-height:44px;font-size:15px}
   .canvas{padding:4px}
 }
+.phone-only{display:none}
+@media (max-width:700px){ .phone-only{display:inline-block} }
 </style>
 </head>
 <body>
@@ -124,6 +126,7 @@ section .share-wrap{padding:0;max-width:none;margin-top:24px}
         <button id="btnRedo" class="ghost" disabled>Redo</button>
         <button id="btnCopy" class="ghost">Copy</button>
         <button id="btnPaste" class="ghost">Paste</button>
+        <button id="btnMulti" class="ghost phone-only">Multi-select</button>
         <button id="btnRotate" class="ghost">Rotate 90° (R)</button>
         <button id="btnDelete" class="danger">Delete selected</button>
       </div>
@@ -791,6 +794,11 @@ $('rot').addEventListener('input', e => {
   refresh();
 });
 $('btnUndo').addEventListener('click', undo);
+$('btnMulti').addEventListener('click', () => {
+  multiMode = !multiMode;
+  $('btnMulti').textContent = multiMode ? 'Multi-select: on' : 'Multi-select';
+  $('btnMulti').className = multiMode ? 'phone-only' : 'ghost phone-only';
+});
 $('btnCopy').addEventListener('click', copySelected);
 $('btnPaste').addEventListener('click', pasteClipboard);
 $('btnRedo').addEventListener('click', redo);
