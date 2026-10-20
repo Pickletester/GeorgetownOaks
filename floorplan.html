@@ -463,6 +463,7 @@ function updateUI(){
   const used = countType('chair');
   const fullSeats = Object.keys(CAT).reduce((s, k) => s + (CAT[k].seatable ? CAT[k].limit * CAT[k].seats : 0), 0);
   $('summary').innerHTML = `
+    <div><b>Total tables:</b> ${['tableA','tableB','round'].reduce((n, k) => n + countType(k), 0)} · <b>Total chairs:</b> ${countType('chair')}</div>
     <div><b>Tables:</b> ${countType('tableA')} A · ${countType('tableB')} B · ${countType('round')} round</div>
     <div><b>Seats at tables:</b> ${seated}</div>
     <div><b>Loose chairs on floor:</b> ${used - seated}</div>
