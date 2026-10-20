@@ -114,6 +114,8 @@ textarea{font:inherit;font-size:13px;padding:6px 8px;border:1px solid #cfc7b4;bo
       <button id="btnSave" class="ghost">Save</button>
       <button id="btnLoad" class="ghost">Load</button>
       <button id="btnSvg" class="ghost">Download SVG</button>
+      <button id="btnUndo" class="ghost" disabled>Undo</button>
+      <button id="btnRedo" class="ghost" disabled>Redo</button>
       <button id="btnMeasure" class="ghost">Measure</button>
       <button id="btnClear" class="ghost">Clear floor</button>
     </div>
@@ -256,6 +258,7 @@ function addItem(props){
 function addStandard(type){
   const c = CAT[type];
   if (countType(type) >= c.limit) return;
+  pushHistory();
   const it = addItem({
     type, w:c.w, d:c.d, fill:c.fill || '#ffffff',
     shape: c.kind === 'circle' ? 'circle' : 'rect',
@@ -319,6 +322,7 @@ function seatTable(t){
 function deleteSelected(){
   const ids = selection.filter(id => { const it = byId(id); return it && !it.locked; });
   if (!ids.length) return;
+  pushHistory();
   items = items.filter(i => !ids.includes(i.id) && !ids.includes(i.parent));
   select(null);
 }
@@ -440,6 +444,38 @@ function updateUI(){
     <div style="margin-top:6px" class="muted">Full inventory at 8 seats per table: ${fullSeats} seats.</div>`;
 }
 
+let undoStack = [], redoStack = [], rotPushed = false;
+function snapshot(){ return JSON.stringify({ items, nextId }); }
+function pushHistory(){
+  const s = snapshot();
+  if (undoStack.length && undoStack[undoStack.length - 1] === s) return;
+  undoStack.push(s);
+  if (undoStack.length > 100) undoStack.shift();
+  redoStack = [];
+  updateHistoryButtons();
+}
+function restoreSnapshot(s){
+  const d = JSON.parse(s);
+  items = d.items; nextId = d.nextId;
+  selection = []; selectedId = null;
+  refresh();
+}
+function undo(){
+  if (!undoStack.length) return;
+  redoStack.push(snapshot());
+  restoreSnapshot(undoStack.pop());
+  updateHistoryButtons();
+}
+function redo(){
+  if (!redoStack.length) return;
+  undoStack.push(snapshot());
+  restoreSnapshot(redoStack.pop());
+  updateHistoryButtons();
+}
+function updateHistoryButtons(){
+  $('btnUndo').disabled = !undoStack.length;
+  $('btnRedo').disabled = !redoStack.length;
+}
 function anyMovable(){ return selection.some(id => { const x = byId(id); return x && !x.locked; }); }
 function refresh(){ render(); updateUI(); }
 
@@ -452,7 +488,7 @@ function select(id, additive){
   // Tables that just got selected and have no chairs yet get seated automatically.
   const fresh = selection.filter(x => !before.includes(x)).map(byId)
     .filter(t => t && CAT[t.type] && CAT[t.type].seatable && !items.some(c => c.parent === t.id));
-  if (fresh.length){ $('seats').value = '8'; fresh.forEach(t => seatTable(t)); }
+  if (fresh.length){ pushHistory(); $('seats').value = '8'; fresh.forEach(t => seatTable(t)); }
   refresh();
 }
 
@@ -522,6 +558,7 @@ svg.addEventListener('pointermove', e => {
     return;
   }
   if (!drag) return;
+  if (!drag.pushed){ pushHistory(); drag.pushed = true; }
   const p = toFt(e);
   let dx = p.x - drag.ax, dy = p.y - drag.ay;
   if (snap){
@@ -562,6 +599,8 @@ svg.addEventListener('pointercancel', endDrag);
 
 document.addEventListener('keydown', e => {
   if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+  if ((e.metaKey || e.ctrlKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z')){ e.preventDefault(); undo(); return; }
+  if ((e.metaKey || e.ctrlKey) && ((e.shiftKey && (e.key === 'z' || e.key === 'Z')) || e.key === 'y' || e.key === 'Y')){ e.preventDefault(); redo(); return; }
   if ((e.metaKey || e.ctrlKey) && (e.key === 'c' || e.key === 'C')){ copySelected(); return; }
   if ((e.metaKey || e.ctrlKey) && (e.key === 'v' || e.key === 'V')){ e.preventDefault(); pasteClipboard(); return; }
   if (!selection.length) return;
@@ -583,6 +622,7 @@ function copySelected(){
 }
 function pasteClipboard(){
   if (!clipboard) return;
+  pushHistory();
   const idMap = {}, newIds = [];
   let skipped = 0, chairsSkipped = 0;
   clipboard.roots.forEach(src => {
@@ -616,6 +656,7 @@ function pasteClipboard(){
 function rotateSelected(delta){
   const movers = selection.map(byId).filter(i => i && !i.locked && !(i.type === 'chair' && i.parent != null && selection.includes(i.parent)));
   if (!movers.length) return;
+  pushHistory();
   movers.forEach(m => setRot(m, m.rot + delta));
   refresh();
 }
@@ -646,6 +687,7 @@ function load(){
     if (!raw){ toast('No saved layout yet.'); return; }
     const data = JSON.parse(raw);
     if (!data || !Array.isArray(data.items)) throw new Error('bad data');
+    pushHistory();
     items = data.items;
     nextId = data.nextId || (Math.max(0, ...items.map(i => i.id)) + 1);
     selection = [];
@@ -696,6 +738,7 @@ $('inventory').addEventListener('click', e => {
 });
 
 $('addCustom').addEventListener('click', () => {
+  pushHistory();
   const k = $('cUnits').value === 'in' ? 1/12 : 1;
   const w = Math.max(0.5, (+$('cW').value || 1) * k);
   const d = Math.max(0.5, (+$('cD').value || 1) * k);
@@ -708,28 +751,35 @@ $('btnRotate').addEventListener('click', () => rotateSelected(90));
 $('btnDelete').addEventListener('click', deleteSelected);
 $('btnDeleteSel').addEventListener('click', deleteSelected);
 $('seats').addEventListener('change', () => {
+  pushHistory();
   selection.forEach(id => { const t = byId(id); if (t && CAT[t.type] && CAT[t.type].seatable) seatTable(t); });
   refresh();
 });
 $('btnUnseat').addEventListener('click', () => {
   const t = byId(selectedId);
   if (!t) return;
+  pushHistory();
   items = items.filter(i => i.parent !== t.id);
   refresh();
 });
 $('snap').addEventListener('change', e => { snap = e.target.checked; });
+$('rot').addEventListener('change', () => { rotPushed = false; });
 $('rot').addEventListener('input', e => {
   const it = byId(selectedId);
   if (!it || it.locked) return;
+  if (!rotPushed){ pushHistory(); rotPushed = true; }
   setRot(it, +e.target.value);
   refresh();
 });
 $('btnSave').addEventListener('click', save);
 $('btnLoad').addEventListener('click', load);
 $('btnSvg').addEventListener('click', downloadSvg);
+$('btnUndo').addEventListener('click', undo);
+$('btnRedo').addEventListener('click', redo);
 $('btnMeasure').addEventListener('click', () => setMeasuring(!measuring));
 $('btnClear').addEventListener('click', () => {
   if (!confirm('Remove all tables, chairs and custom items?')) return;
+  pushHistory();
   items = items.filter(i => i.locked);
   selection = [];
   selectedId = null;
@@ -744,6 +794,7 @@ function encodeLayout(){
   return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
 }
 function loadFromCode(code){
+  pushHistory();
   const data = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
   if (!Array.isArray(data) || !data.length) throw new Error('bad code');
   items = data;
