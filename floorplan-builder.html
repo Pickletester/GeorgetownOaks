@@ -167,7 +167,8 @@ section .share-wrap{padding:0;max-width:none;margin-top:24px}
       <button id="btnCopyCode" class="ghost">Copy layout code</button>
       <button id="btnCopyLink" class="ghost">Copy link</button>
       <button id="btnImage" class="ghost">Download image</button>
-      <label style="margin-top:14px">Open a layout <input id="loadCode" placeholder="Paste a layout code"></label>
+      <textarea id="codeBox" readonly rows="3" onclick="this.select()" style="font-family:Menlo,Consolas,monospace;font-size:11px;margin-bottom:12px"></textarea>
+    <label style="margin-top:14px">Open a layout <input id="loadCode" placeholder="Paste a layout code"></label>
       <button id="btnLoadCode" class="ghost">Open layout</button>
     </section>
   </div>
@@ -488,7 +489,11 @@ function updateHistoryButtons(){
   $('btnRedo').disabled = !redoStack.length;
 }
 function anyMovable(){ return selection.some(id => { const x = byId(id); return x && !x.locked; }); }
-function refresh(){ render(); updateUI(); }
+function scheduleCode(){
+  clearTimeout(window._codeTimer);
+  window._codeTimer = setTimeout(async () => { $('codeBox').value = await layoutCode(); }, 250);
+}
+function refresh(){ render(); updateUI(); scheduleCode(); }
 
 function select(id, additive){
   const before = selection.slice();
