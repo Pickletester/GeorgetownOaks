@@ -139,7 +139,7 @@ const CAT = {
 // Fixed elements. The window wall is the LEFT edge (x = 0), the 46.5 ft side, doors at the top corner.
 // Sizes and gaps follow the photo labels. The last pillar is pinned to the corner, 2.6 ft short of its 14.58 ft gap.
 const FIXED = [
-  { type:'door',   x:68.7, y:40.1, w:3, d:0.6, rot:90, fill:'#c8b08a', label:'Storage' },
+  { type:'door',   x:68.7, y:42.42, w:3, d:0.6, rot:90, fill:'#c8b08a', label:'Storage' },
   { type:'door',   x:68.7, y:21.75, w:3, d:0.6, rot:90, fill:'#9aa3ad', label:'Exit door' },
   { type:'door',   x:6.7,  y:0.3,  w:6.2, d:0.6, fill:'#c8a24a', label:'Glass doors' },
   { type:'window', x:21.8, y:0.3,  w:6,   d:0.6, fill:'#cfe6ee' },
@@ -156,7 +156,7 @@ const FIXED = [
   { type:'pillar', x:0.35,  y:15.453,  w:1.375, d:0.7,  rot:90, fill:'#3b4048' },
   { type:'window', x:0.3,   y:11.000,  w:5.8,   d:0.6,  rot:90, fill:'#cfe6ee' },
   { type:'pillar', x:0.455, y:1.4,   w:2.8,   d:0.91, rot:90, fill:'#3b4048' },
-  { type:'bar', x:76.5, y:31.75, w:12, d:3, rot:90, fill:'#c9c9c9', label:'Bar' },
+  { type:'bar', x:76.5, y:32.92, w:12, d:3, rot:90, fill:'#c9c9c9', label:'Bar' },
 ];
 
 const svg = document.getElementById('plan');
@@ -289,9 +289,9 @@ function roomMarkup(){
   </defs>
   <rect x="0" y="0" width="${W}" height="${D}" fill="url(#planks)" stroke="#2a2f36" stroke-width="6" vector-effect="non-scaling-stroke"/>
   <rect x="0.7" y="0.7" width="${W-1.4}" height="${D-1.4}" fill="none" stroke="#c8a24a" stroke-width="1.5" vector-effect="non-scaling-stroke" pointer-events="none"/>
-  <rect x="${W-0.5}" y="25.75" width="1" height="12" fill="url(#planks)" pointer-events="none"/>
-  <rect x="${W}" y="25.75" width="9" height="12" fill="url(#planks)" pointer-events="none"/>
-  <path d="M ${W} 25.75 L ${W+9} 25.75 L ${W+9} 37.75 L ${W} 37.75" fill="none" stroke="#2a2f36" stroke-width="5" vector-effect="non-scaling-stroke" pointer-events="none"/>
+  <rect x="${W-0.5}" y="25.75" width="1" height="14.33" fill="url(#planks)" pointer-events="none"/>
+  <rect x="${W}" y="25.75" width="9" height="14.33" fill="url(#planks)" pointer-events="none"/>
+  <path d="M ${W} 25.75 L ${W+9} 25.75 L ${W+9} 40.08 L ${W} 40.08" fill="none" stroke="#2a2f36" stroke-width="5" vector-effect="non-scaling-stroke" pointer-events="none"/>
   <text x="${W+4.5}" y="24.7" text-anchor="middle" font-size="1" fill="#2a2f36" pointer-events="none">Bar room</text>
   <g stroke="#2a2f36" stroke-width="1" fill="#2a2f36" vector-effect="non-scaling-stroke" pointer-events="none">
     <line x1="0" y1="-1.6" x2="${W}" y2="-1.6"/>
