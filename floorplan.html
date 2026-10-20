@@ -175,6 +175,7 @@ section .share-wrap{padding:0;max-width:none;margin-top:24px}
         <button type="submit" id="sendLayout">Send to Director of Events</button>
         <p id="sendStatus" role="status" class="muted"></p>
       </form>
+    <p id="sendThanks" hidden style="font-size:16px;line-height:1.6;color:#2a2f36;margin:24px 0">Thank you! We've sent you an email with your layout. Morgan will be in touch soon.</p>
     </section>
     <section class="share-card">
       <h2>Your layout code</h2>
@@ -1004,6 +1005,14 @@ $('btnLoadCode').addEventListener('click', async () => {
 $('btnCopyCode').addEventListener('click', () => copyText(layoutCode(), 'Layout code copied.'));
 $('btnCopyLink').addEventListener('click', () => copyText(layoutLink(), 'Link copied.'));
 $('btnImage').addEventListener('click', downloadImage);
+function showThanks(form){
+  const card = form.closest('section');
+  const parts = [...card.children].filter(c => c.id !== 'sendThanks');
+  const thanks = document.getElementById('sendThanks');
+  parts.forEach(c => { c.hidden = true; });
+  thanks.hidden = false;
+  setTimeout(() => { parts.forEach(c => { c.hidden = false; }); thanks.hidden = true; }, 5000);
+}
 $('layoutForm').addEventListener('submit', async e => {
   e.preventDefault();
   const form = e.target, status = $('sendStatus'), btn = $('sendLayout');
@@ -1014,7 +1023,7 @@ $('layoutForm').addEventListener('submit', async e => {
   try {
     const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form) });
     const json = await res.json();
-    if (json.success){ status.textContent = 'Thank you! We\'ve sent you an email with your layout. Morgan will be in touch soon.'; form.reset(); }
+    if (json.success){ form.reset(); showThanks(form); }
     else status.textContent = 'Something went wrong. Please call (412) 914-8298.';
   } catch (err) {
     status.textContent = 'Could not send. Please call (412) 914-8298.';
