@@ -142,6 +142,7 @@ section .share-wrap{padding:0;max-width:none;margin-top:24px}
         <span class="tlabel">Plan</span>
         <label class="inline"><input id="snap" type="checkbox" checked> Snap to 6 in</label>
         <button id="btnMeasure" class="ghost">Measure</button>
+        <button id="btnImage" class="ghost">Download image</button>
         <button id="btnClear" class="ghost">Clear floor</button>
       </div>
     </div>
@@ -176,14 +177,6 @@ section .share-wrap{padding:0;max-width:none;margin-top:24px}
         <p id="sendStatus" role="status" class="muted"></p>
       </form>
     <p id="sendThanks" hidden style="font-size:16px;line-height:1.6;color:#2a2f36;margin:24px 0">Thank you! We've sent you an email with your layout. Morgan will be in touch soon.</p>
-    </section>
-    <section class="share-card">
-      <h2>Your layout code</h2>
-      <p class="muted">Save this code or link. Paste it below any time to open the layout again.</p>
-      <button id="btnImage" class="ghost">Download image</button>
-      <textarea id="codeBox" readonly rows="3" onclick="this.select()" style="font-family:Menlo,Consolas,monospace;font-size:11px;margin-bottom:12px"></textarea>
-    <label style="margin-top:14px">Open a layout <input id="loadCode" placeholder="Paste a layout code"></label>
-      <button id="btnLoadCode" class="ghost">Open layout</button>
     </section>
   </div>
   </section>
@@ -503,11 +496,7 @@ function updateHistoryButtons(){
   $('btnRedo').disabled = !redoStack.length;
 }
 function anyMovable(){ return selection.some(id => { const x = byId(id); return x && !x.locked; }); }
-function scheduleCode(){
-  clearTimeout(window._codeTimer);
-  window._codeTimer = setTimeout(async () => { $('codeBox').value = await layoutCode(); }, 250);
-}
-function refresh(){ render(); updateUI(); scheduleCode(); }
+function refresh(){ render(); updateUI(); }
 
 function select(id, additive){
   const before = selection.slice();
@@ -996,10 +985,6 @@ async function downloadImage(){
   img.onerror = () => toast('Could not make the image.');
   img.src = url;
 }
-$('btnLoadCode').addEventListener('click', async () => {
-  try { await loadFromCode($('loadCode').value); toast('Layout opened.'); }
-  catch (err) { toast('That layout code did not open.'); }
-});
 $('btnImage').addEventListener('click', downloadImage);
 function showThanks(form){
   const card = form.closest('section');
