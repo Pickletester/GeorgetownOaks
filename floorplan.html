@@ -399,9 +399,15 @@ function bodyMarkup(it, stroke, sw){
   return `<rect x="${-hw}" y="${-hd}" width="${it.w}" height="${it.d}" rx="0.1" fill="${it.fill}" ${attrs}/>`;
 }
 
+function tableNumber(it){
+  if (!(CAT[it.type] && CAT[it.type].seatable) || it.parent != null) return 0;
+  const tables = items.filter(i => CAT[i.type] && CAT[i.type].seatable && i.parent == null);
+  return tables.indexOf(it) + 1;
+}
 function labelMarkup(it){
   if (it.type === 'chair' || it.type === 'pillar') return '';
-  const text = (it.type === 'custom' || it.label) ? it.label : (CAT[it.type] ? CAT[it.type].short : '');
+  const n = tableNumber(it);
+  const text = n ? 'T' + n : (it.type === 'custom' || it.label) ? it.label : (CAT[it.type] ? CAT[it.type].short : '');
   if (!text) return '';
   const fs = Math.max(0.6, Math.min(1.3, Math.min(it.w, it.d) * 0.3));
   return `<text transform="rotate(${-it.rot})" text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="600" fill="${textOn(it.fill)}" pointer-events="none">${esc(text)}</text>`;
@@ -460,6 +466,7 @@ function updateUI(){
   const used = countType('chair');
   const fullSeats = Object.keys(CAT).reduce((s, k) => s + (CAT[k].seatable ? CAT[k].limit * CAT[k].seats : 0), 0);
   $('summary').innerHTML = `
+    <div><b>Head count (guest seats):</b> ${items.filter(i => i.type === 'chair' && i.parent != null).length}</div>
     <div><b>Total tables:</b> ${['tableA','tableB','round'].reduce((n, k) => n + countType(k), 0)} · <b>Total chairs:</b> ${countType('chair')}</div>
     <div><b>Tables:</b> ${countType('tableA')} A · ${countType('tableB')} B · ${countType('round')} round</div>
     <div><b>Seats at tables:</b> ${seated}</div>
@@ -1005,7 +1012,10 @@ async function downloadImage(){
   const W_PX = 1600, H_PX = Math.round(1600 * vbH / 82);
   const logoW = logo ? 4.5 * (logo.naturalWidth / logo.naturalHeight) : 0;
   const titleX = logo ? -4 + logoW + 1 : -4;
-  const titleText = logo ? 'Main Hall layout' : 'Georgetown Oaks · Main Hall layout';
+  const tableTotal = items.filter(i => CAT[i.type] && CAT[i.type].seatable && i.parent == null).length;
+  const guestTotal = items.filter(i => i.type === 'chair' && i.parent != null).length;
+  const stats = ` · ${tableTotal} tables · ${guestTotal} guests`;
+  const titleText = (logo ? 'Main Hall layout' : 'Georgetown Oaks · Main Hall layout') + stats;
   const clone = svg.cloneNode(true);
   clone.setAttribute('xmlns', NS);
   clone.removeAttribute('style');
