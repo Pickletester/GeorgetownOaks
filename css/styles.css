@@ -585,8 +585,8 @@ a { text-decoration: none; color: inherit; }
   color: rgba(255,255,255,0.62); margin-bottom: 0.3rem;
 }
 .c-val {
-  font-family: var(--serif-body); font-size: 1.15rem;
-  font-weight: 400; color: rgba(255,255,255,0.94); line-height: 1.5;
+  font-family: var(--serif-body); font-size: 1.3rem;
+  font-weight: 600; color: rgba(255,255,255,0.97); line-height: 1.5;
 }
 .c-val a { color: var(--gold); }
 
